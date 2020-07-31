@@ -206,7 +206,7 @@ class Timer {
         this.current_row = 0;
         this.amount_selected = 0;
         for (let i = 0; i < this.amount_splits; i++) {
-            this.table.deleteRow(i);
+            this.table.deleteRow(0);
         }
         this.amount_splits = 0;
 
