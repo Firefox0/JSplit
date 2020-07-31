@@ -26,9 +26,12 @@ body {
 #start-button,
 #stop-button,
 #pause-button,
-#add-button,
+#append-button,
 #split-button,
-#delete-button {
+#delete-button,
+#insert-above-button,
+#insert-below-button,
+#reset-button {
     width: 100;
 }
 

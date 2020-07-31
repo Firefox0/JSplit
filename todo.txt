@@ -1,1 +1,2 @@
 restructure with css, put table on top?
+block insert above and below while running, bugs otherwise due to current_row

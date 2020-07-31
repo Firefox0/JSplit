@@ -1,9 +1,11 @@
 class Timer {
 
+    // timer running
     running = false;
+    // current row while splitting
     current_row = 0;
+    // total amount of splits
     amount_splits = 0;
-
     // splits selected
     amount_selected = 0;
 
@@ -113,11 +115,11 @@ class Timer {
         return num;
     }
 
-    add_split() {
+    add_split(row_index = -1) {
         let content = this.user_input.value;
         if (content) {
             // add row and keep count of splits
-            let row = this.table.insertRow(-1);
+            let row = this.table.insertRow(row_index);
             row.onclick = (() => this.select_row(row)).bind(this);
             let split_name = row.insertCell(0);
             split_name.innerHTML = content;
@@ -143,14 +145,18 @@ class Timer {
         }
         // enable/disable delete button
         if (this.amount_selected > 0) {
-            if (this.delete_button.disabled) {
-                this.delete_button.disabled = false;
+            if (this.amount_selected == 1) {
+                this.insert_above_button.disabled = false;
+                this.insert_below_button.disabled = false;
             }
+            else {
+                this.insert_above_button.disabled = true;
+                this.insert_below_button.disabled = true;
+            }   
+            this.delete_button.disabled = false;
         }
         else {
-            if (!this.delete_button.disabled) {
-                this.delete_button.disabled = true;
-            }
+            this.delete_button.disabled = true;
         }
     }
 
@@ -175,6 +181,40 @@ class Timer {
         this.delete_button.disabled = true;
     }
 
+    insert_above() {
+        for (let i = 0; i < this.amount_splits; i++) {
+            if (this.table.rows[i].style.color == "black") {
+                this.add_split(i);
+                return;
+            }
+        }
+    }
+
+    insert_below() {
+        for (let i = 0; i < this.amount_splits; i++) {
+            if (this.table.rows[i].style.color == "black") {
+                this.add_split(i + 1);
+                return;
+            }
+        }
+    }
+
+    reset() {
+        this.running = false;
+        this.current_row = 0;
+        this.amount_selected = 0;
+        for (let i = 0; i < this.amount_splits; i++) {
+            this.table.deleteRow(i);
+        }
+        this.amount_splits = 0;
+
+        this.stop_button.disabled = true;
+        this.pause_button.disabled = true;
+        this.delete_button.disabled = true;
+        this.insert_above_button.disabled = true;
+        this.insert_below_button.disabled = true;
+    }
+
     main() {
         this.timer_time = document.getElementById("time");
         this.start_button = document.getElementById("start-button");
@@ -193,8 +233,8 @@ class Timer {
         this.table = document.getElementById("table");
         this.user_input = document.getElementById("user-input");
 
-        let add_button = document.getElementById("add-button");
-        add_button.onclick = (() => this.add_split()).bind(this);
+        let append_button = document.getElementById("append-button");
+        append_button.onclick = (() => this.add_split()).bind(this);
 
         let split_button = document.getElementById("split-button");
         split_button.onclick = (() => this.split()).bind(this);
@@ -202,6 +242,17 @@ class Timer {
         this.delete_button = document.getElementById("delete-button");
         this.delete_button.onclick = (() => this.delete_split()).bind(this);
         this.delete_button.disabled = true;
+
+        this.insert_above_button = document.getElementById("insert-above-button");
+        this.insert_above_button.onclick = (() => this.insert_above()).bind(this);
+        this.insert_above_button.disabled = true;
+
+        this.insert_below_button = document.getElementById("insert-below-button");
+        this.insert_below_button.onclick = (() => this.insert_below()).bind(this);
+        this.insert_below_button.disabled = true;
+
+        this.reset_button = document.getElementById("reset-button");
+        this.reset_button.onclick = (() => this.reset()).bind(this);
     }
 }
 
