@@ -13,6 +13,9 @@ class Timer {
         // if timer is already running, ignore further start presses
         this.stop_button.disabled = false;
         this.pause_button.disabled = false;
+        this.append_button.disabled = true;
+        this.insert_above_button.disabled = true;
+        this.insert_below_button.disabled = true;
 
         this.running = true;
         this.start_button.disabled = true;
@@ -30,6 +33,7 @@ class Timer {
 
             // if stop button was pressed
             if (!this.running) {
+                this.append_button.disabled = false;
                 return;
             }
             // get current time
@@ -146,14 +150,16 @@ class Timer {
         }
         // enable/disable delete button
         if (this.amount_selected > 0) {
-            if (this.amount_selected == 1) {
-                this.insert_above_button.disabled = false;
-                this.insert_below_button.disabled = false;
+            if (!this.running) {
+                if (this.amount_selected == 1) {
+                    this.insert_above_button.disabled = false;
+                    this.insert_below_button.disabled = false;
+                }
+                else {
+                    this.insert_above_button.disabled = true;
+                    this.insert_below_button.disabled = true;
+                }   
             }
-            else {
-                this.insert_above_button.disabled = true;
-                this.insert_below_button.disabled = true;
-            }   
             this.delete_button.disabled = false;
         }
         else {
@@ -235,8 +241,8 @@ class Timer {
         this.table = document.getElementById("table");
         this.user_input = document.getElementById("user-input");
 
-        let append_button = document.getElementById("append-button");
-        append_button.onclick = (() => this.add_split()).bind(this);
+        this.append_button = document.getElementById("append-button");
+        this.append_button.onclick = (() => this.add_split()).bind(this);
 
         this.split_button = document.getElementById("split-button");
         this.split_button.onclick = (() => this.split()).bind(this);
