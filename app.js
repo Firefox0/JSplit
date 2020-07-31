@@ -116,6 +116,7 @@ class Timer {
     }
 
     add_split(row_index = -1) {
+        this.split_button.disabled = false;
         let content = this.user_input.value;
         if (content) {
             // add row and keep count of splits
@@ -165,6 +166,7 @@ class Timer {
         this.current_row++;
         // pause when all splits are done
         if (this.current_row == this.amount_splits) {
+            this.split_button.disabled = true;
             this.pause_timer();
         }
     }
@@ -236,9 +238,10 @@ class Timer {
         let append_button = document.getElementById("append-button");
         append_button.onclick = (() => this.add_split()).bind(this);
 
-        let split_button = document.getElementById("split-button");
-        split_button.onclick = (() => this.split()).bind(this);
-        
+        this.split_button = document.getElementById("split-button");
+        this.split_button.onclick = (() => this.split()).bind(this);
+        this.split_button.disabled = true;
+
         this.delete_button = document.getElementById("delete-button");
         this.delete_button.onclick = (() => this.delete_split()).bind(this);
         this.delete_button.disabled = true;
