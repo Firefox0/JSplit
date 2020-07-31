@@ -1,4 +1,1 @@
-focus user input after typing
-pause button
 restructure with css, put table on top?
-grey out buttons if invalid state (stop time when split is finished)

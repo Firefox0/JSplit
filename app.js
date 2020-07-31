@@ -105,20 +105,21 @@ class Timer {
     get_milliseconds(time, add_zero = true) {
         let milliseconds = Math.floor(time % 1000);
         if (add_zero) {
-            milliseconds = this.insert_zeros(milliseconds, 2);
+            milliseconds = this.insert_zeros(milliseconds, 3);
         }
         return milliseconds;
     }
 
-    insert_zeros(num, expand_by = 1) {
-        // check if num is single digit and then insert 0 if that's the case
-        let zero_s = "";
-        for (let l = 1; l <= expand_by; l++) {
-            if (num < Math.pow(10, l)) {
-                zero_s += "0";
+    insert_zeros(num, length = 2) {
+        // insert zeros to the beginning of num until length reached
+        let num_length = num.toString().length;
+        let difference = length - num_length;
+        if (difference > 0) {
+            for (let i = 0; i < difference; i++) {
+                num = "0" + num;
             }
         }
-        return zero_s + num;
+        return num;
     }
 
     add_split() {
