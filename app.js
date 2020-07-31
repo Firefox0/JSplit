@@ -10,7 +10,6 @@ class Timer {
     amount_selected = 0;
 
     start_timer() {
-        // if timer is already running, ignore further start presses
         this.stop_button.disabled = false;
         this.pause_button.disabled = false;
         this.append_button.disabled = true;
@@ -65,14 +64,6 @@ class Timer {
         this.pause_button.disabled = true;
         this.running = false;
         this.pause_time = new Date().getTime();
-        setInterval((() => {
-            if (this.running) {
-                return;
-            }
-            else {
-
-            }
-        }).bind(this));
     }
 
     get_hours(time, add_zero = true) {
@@ -148,7 +139,7 @@ class Timer {
             e.style.color = "white";
             this.amount_selected--;
         }
-        // enable/disable delete button
+
         if (this.amount_selected > 0) {
             if (!this.running) {
                 if (this.amount_selected == 1) {
