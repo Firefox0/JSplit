@@ -1,20 +1,11 @@
 class Timer {
 
     running = false;
-    timer_time = null;
-    user_input = null;
-    table = null;
     current_row = 0;
     amount_splits = 0;
 
-    start_button = null;
-    stop_button = null;
-    pause_button = null;
-
-    // time when timer started
-    start_time = null;
-    // time when pause started
-    pause_time = null;
+    // splits selected
+    amount_selected = 0;
 
     start_timer() {
         // if timer is already running, ignore further start presses
@@ -127,8 +118,10 @@ class Timer {
         if (content) {
             // add row and keep count of splits
             let row = this.table.insertRow(-1);
+            row.onclick = (() => this.select_row(row)).bind(this);
             let split_name = row.insertCell(0);
             split_name.innerHTML = content;
+            // placeholder for split time
             row.insertCell(1);
             this.amount_splits++;
             // clear form
@@ -138,6 +131,29 @@ class Timer {
         this.user_input.focus();
     }
 
+    select_row(e) {
+        // default color is empty even though it looks white
+        if (e.style.color != "black") {
+            e.style.color = "black";
+            this.amount_selected++;
+        }
+        else {
+            e.style.color = "white";
+            this.amount_selected--;
+        }
+        // enable/disable delete button
+        if (this.amount_selected > 0) {
+            if (this.delete_button.disabled) {
+                this.delete_button.disabled = false;
+            }
+        }
+        else {
+            if (!this.delete_button.disabled) {
+                this.delete_button.disabled = true;
+            }
+        }
+    }
+
     split() {
         this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerHTML;
         this.current_row++;
@@ -145,6 +161,18 @@ class Timer {
         if (this.current_row == this.amount_splits) {
             this.pause_timer();
         }
+    }
+
+    delete_split() {
+        for (let i = 0; i < this.amount_splits; i++) {
+            if (this.table.rows[i].style.color == "black") {
+                this.table.deleteRow(i);
+                this.amount_splits--;
+                // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
+                i--;
+            }
+        }
+        this.delete_button.disabled = true;
     }
 
     main() {
@@ -170,7 +198,10 @@ class Timer {
 
         let split_button = document.getElementById("split-button");
         split_button.onclick = (() => this.split()).bind(this);
-
+        
+        this.delete_button = document.getElementById("delete-button");
+        this.delete_button.onclick = (() => this.delete_split()).bind(this);
+        this.delete_button.disabled = true;
     }
 }
 

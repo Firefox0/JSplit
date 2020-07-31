@@ -27,11 +27,12 @@ body {
 #stop-button,
 #pause-button,
 #add-button,
-#split-button {
+#split-button,
+#delete-button {
     width: 100;
 }
 
 #user-input {
-    width: 200;
+    width: 310;
     height: 25;
 }
