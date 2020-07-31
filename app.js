@@ -2,6 +2,9 @@ class Timer {
 
     running = false;
     timer_time = null;
+    user_input = null;
+    table = null;
+    current_row = 0;
 
     start_timer() {
         // if timer is already running, ignore further start presses
@@ -39,7 +42,7 @@ class Timer {
     get_hours(time, add_zero = true) {
         let hours =  Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         if (add_zero) {
-            hours = this.expand_single_digit(hours);
+            hours = this.insert_zeros(hours);
         }
         return hours;
     }
@@ -47,7 +50,7 @@ class Timer {
     get_minutes(time, add_zero = true) {
         let minutes =  Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
         if (add_zero) {
-            minutes = this.expand_single_digit(minutes);
+            minutes = this.insert_zeros(minutes);
         }
         return minutes;
     }
@@ -55,7 +58,7 @@ class Timer {
     get_seconds(time, add_zero = true) {
         let seconds = Math.floor((time % (1000 * 60)) / 1000);
         if (add_zero) {
-            seconds = this.expand_single_digit(seconds);
+            seconds = this.insert_zeros(seconds);
         }
         return seconds;
     }
@@ -63,17 +66,34 @@ class Timer {
     get_milliseconds(time, add_zero = true) {
         let milliseconds = Math.floor(time % 1000);
         if (add_zero) {
-            milliseconds = this.expand_single_digit(milliseconds);
+            milliseconds = this.insert_zeros(milliseconds, 2);
         }
         return milliseconds;
     }
 
-    expand_single_digit(num) {
+    insert_zeros(num, expand_by = 1) {
         // check if num is single digit and then insert 0 if that's the case
-        if (num < 10) {
-            num = "0" + num;
+        let zero_s = "";
+        for (let l = 1; l <= expand_by; l++) {
+            if (num < Math.pow(10, l)) {
+                zero_s += "0";
+            }
         }
-        return num;
+        return zero_s + num;
+    }
+
+    add_split() {
+        let content = this.user_input.value;
+        let row = this.table.insertRow(-1);
+        let split_name = row.insertCell(0);
+        split_name.innerHTML = content;
+        row.insertCell(1);
+        this.user_input.value = "";
+    }
+
+    split() {
+        this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerHTML;
+        this.current_row++;
     }
 
     main() {
@@ -84,7 +104,16 @@ class Timer {
         start_button.onclick = function(){this.start_timer()}.bind(this);
         let stop_button = document.getElementById("stop-button");
         stop_button.onclick = function(){this.stop_timer()}.bind(this);
-        console.log("Main");
+
+        this.table = document.getElementById("table");
+
+        let add_button = document.getElementById("add-button");
+        add_button.onclick = function(){this.add_split()}.bind(this);
+
+        this.user_input = document.getElementById("user-input");
+
+        let split_button = document.getElementById("split-button");
+        split_button.onclick = function(){this.split()}.bind(this);
     }
 }
 
