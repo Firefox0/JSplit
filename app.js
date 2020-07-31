@@ -4,28 +4,36 @@ class Timer {
     timer_time = null;
 
     start_timer() {
+        // if timer is already running, ignore further start presses
+        if (this.running) {
+            return;
+        }
         this.running = true;
         let start = new Date().getTime();
-        console.log("running is: " + this.running);
         setInterval(function(){
+            // if stop button was pressed
             if (!this.running) {
                 return;
             }
+
+            // get current time
             let now = new Date().getTime();
             let difference = now - start;
 
             let hours = this.get_hours(difference);
             let minutes = this.get_minutes(difference);
             let seconds = this.get_seconds(difference);
+            let milliseconds = this.get_milliseconds(difference);
 
             // display new time
-            this.timer_time.innerHTML = hours + ":" + minutes + ":" + seconds;
+            this.timer_time.innerHTML = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+
         }.bind(this));
     }
 
     stop_timer() {
         this.running = false;
-        this.timer_time.innerHTML = "00:00:00";
+        this.timer_time.innerHTML = "00:00:00.000";
     }
 
     get_hours(time, add_zero = true) {
@@ -52,6 +60,14 @@ class Timer {
         return seconds;
     }
 
+    get_milliseconds(time, add_zero = true) {
+        let milliseconds = Math.floor(time % 1000);
+        if (add_zero) {
+            milliseconds = this.expand_single_digit(milliseconds);
+        }
+        return milliseconds;
+    }
+
     expand_single_digit(num) {
         // check if num is single digit and then insert 0 if that's the case
         if (num < 10) {
@@ -63,7 +79,8 @@ class Timer {
     main() {
         this.timer_time = document.getElementById("time");
         let start_button = document.getElementById("start-button");
-        // function(){} so js doesnt call the function
+        // function(){} so js doesnt call the function, also bind it to class so it can 
+        // access class attributes
         start_button.onclick = function(){this.start_timer()}.bind(this);
         let stop_button = document.getElementById("stop-button");
         stop_button.onclick = function(){this.stop_timer()}.bind(this);
