@@ -33,7 +33,7 @@ class Timer {
             this.pause_time = null;
         }
 
-        setInterval(function() {
+        setInterval((() => {
 
             // if stop button was pressed
             if (!this.running) {
@@ -51,7 +51,7 @@ class Timer {
             // display new time
             this.timer_time.innerHTML = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 
-        }.bind(this));
+        }).bind(this));
     }
 
     stop_timer() {
@@ -68,14 +68,14 @@ class Timer {
         this.pause_button.disabled = true;
         this.running = false;
         this.pause_time = new Date().getTime();
-        setInterval(function() {
+        setInterval((() => {
             if (this.running) {
                 return;
             }
             else {
 
             }
-        }.bind(this));
+        }).bind(this));
     }
 
     get_hours(time, add_zero = true) {
@@ -151,24 +151,24 @@ class Timer {
         this.start_button = document.getElementById("start-button");
         // function(){} so js doesnt call the function, also bind it to class so it can 
         // access class attributes
-        this.start_button.onclick = function(){this.start_timer()}.bind(this);
+        this.start_button.onclick = (() => this.start_timer()).bind(this);
 
         this.stop_button = document.getElementById("stop-button");
-        this.stop_button.onclick = function(){this.stop_timer()}.bind(this);
+        this.stop_button.onclick = (() => this.stop_timer()).bind(this);
         this.stop_button.disabled = true;
 
         this.pause_button = document.getElementById("pause-button");
-        this.pause_button.onclick = function(){this.pause_timer()}.bind(this);
+        this.pause_button.onclick = (() => this.pause_timer()).bind(this);
         this.pause_button.disabled = true;
 
         this.table = document.getElementById("table");
         this.user_input = document.getElementById("user-input");
 
         let add_button = document.getElementById("add-button");
-        add_button.onclick = function(){this.add_split()}.bind(this);
+        add_button.onclick = (() => this.add_split()).bind(this);
 
         let split_button = document.getElementById("split-button");
-        split_button.onclick = function(){this.split()}.bind(this);
+        split_button.onclick = (() => this.split()).bind(this);
 
     }
 }
