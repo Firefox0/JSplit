@@ -15,10 +15,23 @@ body {
     color: white;
 }
 
-#start-button {
-    width: 125;
-}
-
 #table {
     border: 1px solid black;
+}
+
+#time {
+    text-align: center;
+}
+
+#start-button,
+#stop-button,
+#pause-button,
+#add-button,
+#split-button {
+    width: 100;
+}
+
+#user-input {
+    width: 200;
+    height: 25;
 }
