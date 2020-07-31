@@ -15,9 +15,17 @@ class Timer {
         this.append_button.disabled = true;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
-
-        this.running = true;
         this.start_button.disabled = true;
+        this.running = true;
+
+        // reset style colors in case rows are still select
+        // (prevent issue where insert buttons only enable/disable when selection is done, 
+        // but not when paused/stopped even though this would be valid)
+        if (amount_splits > 0) {
+            for (let i = 0; i < this.amount_splits; i++) {
+                this.table.rows[i].style.color = "";
+            }
+        }
 
         // if start time null then initialize (from stop)
         if (!this.start_time) {
@@ -136,7 +144,7 @@ class Timer {
             this.amount_selected++;
         }
         else {
-            e.style.color = "white";
+            e.style.color = "";
             this.amount_selected--;
         }
 
