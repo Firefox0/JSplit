@@ -1,0 +1,45 @@
+* { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(rgb(47, 150, 163), rgb(48, 62, 143));
+    font-family: sans-serif;
+    color: white;
+}
+
+#table {
+    border: 1px solid black;
+}
+
+#time {
+    text-align: center;
+}
+
+#start-button,
+#stop-button,
+#pause-button,
+#append-button,
+#split-button,
+#delete-button,
+#insert-above-button,
+#insert-below-button,
+#reset-button {
+    width: 100;
+    /* make it clickable */
+    -webkit-app-region: no-drag;
+}
+
+#user-input {
+    width: 310;
+    height: 25;
+    /* make it clickable */
+    -webkit-app-region: no-drag;
+}
