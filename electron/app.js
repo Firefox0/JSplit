@@ -229,7 +229,6 @@ class Timer {
         // key listener
         document.addEventListener("keydown", event => {
             const key = event.key;
-            console.log(key);
             if (key == "1") {
                 if (this.running) {
                     this.split();
@@ -262,6 +261,12 @@ class Timer {
         });
     }
     
+    set_game() {
+        this.current_game.innerHTML = this.user_input.value; 
+        this.user_input.value = "";
+        this.user_input.focus();
+    }
+
     main() {
 
         this.timer_time = document.getElementById("time");
@@ -305,9 +310,14 @@ class Timer {
 
         this.split_elements = document.getElementsByClassName("splits");
 
+        this.current_game = document.getElementById("game");
+        this.set_game_button = document.getElementById("set-game-button");
+        this.set_game_button.onclick = (() => this.set_game()).bind(this);
+
         // start listening to keys after everything was loaded
         this.key_listener();
     }
 }
 
-window.addEventListener("load", new Timer().main());
+const jsplit = new Timer();
+window.addEventListener("load", jsplit.main());
