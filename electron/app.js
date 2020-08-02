@@ -42,6 +42,18 @@ class Timer {
             // if stop button was pressed
             if (!this.running) {
                 this.append_button.disabled = false;
+                // save times
+                if (this.amount_splits > 0) {
+                    var split_names = [], split_times = [];
+                    for (let i = 0; i < this.table.rows.length; i++) {
+                        split_names[i] = this.table.rows[i].cells[0].innerHTML;
+                        split_times[i] = this.table.rows[i].cells[1].innerHTML;
+                    }
+                    let dict = {};
+                    dict.split_names = split_names;
+                    dict.split_times = split_times;
+                    write_file(this.current_game + ".txt", JSON.stringify(game), "utf-8");
+                }
                 return;
             }
             // get current time

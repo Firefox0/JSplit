@@ -36,7 +36,8 @@ body {
 #delete-button,
 #insert-above-button,
 #insert-below-button,
-#reset-button {
+#reset-button,
+#set-game-button {
     width: 100;
     /* make it clickable */
     -webkit-app-region: no-drag;
