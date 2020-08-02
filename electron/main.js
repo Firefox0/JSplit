@@ -1,11 +1,9 @@
-const {app, BrowserWindow} = require("electron");
+const {app, BrowserWindow, Menu, MenuItem} = require("electron");
 
 // node js core module path
 const path = require("path");
 // url module
 const url = require("url");
-// right click context menu
-const context_menu = require("electron-context-menu");
 
 // init window object
 let win;
@@ -29,6 +27,16 @@ function create_window() {
         slashes: true
     }));
 
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: "Load Split"
+    }))
+    
+    // attach context menu to app
+    win.webContents.on("context-menu", (e, params) => {
+        menu.popup(win, params.x, params.y)
+    })
+
     // open dev tools on start
     win.webContents.openDevTools();
 
@@ -36,7 +44,7 @@ function create_window() {
 }
 
 // run create window function
-app.on("ready", create_window);
+app.on("ready", () => create_window())
 
 // quit when all windows are closed
 app.on("window-all-closed", () => {
