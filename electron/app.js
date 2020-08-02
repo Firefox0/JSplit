@@ -221,6 +221,8 @@ class Timer {
         this.delete_button.disabled = true;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
+
+        this.user_input.value = "";
     }
 
     key_listener() {
