@@ -10,6 +10,7 @@ class Timer {
     amount_selected = 0;
 
     start_timer() {
+
         this.stop_button.disabled = false;
         this.pause_button.disabled = false;
         this.append_button.disabled = true;
@@ -226,14 +227,30 @@ class Timer {
         // key listener
         document.addEventListener("keydown", event => {
             const key = event.key;
+            console.log(key);
             if (key == "1") {
                 this.start_timer();
+            }
+            // toggle
+            else if (key == "2") {
+                let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
+                for (let i = 0; i < this.split_elements.length; i++) {
+                    if (visible) {
+                        this.split_elements[i].style.visibility = "hidden";
+                    }
+                    else {
+                        this.split_elements[i].removeAttribute("style");
+                    }
+                }
             }
             else if (key == "3") {
                 this.stop_timer();
             }
             else if (key == "5") {
                 this.pause_timer();
+            }
+            else if (key == "Enter") {
+                this.add_split();
             }
         });
     }
@@ -278,6 +295,8 @@ class Timer {
 
         this.reset_button = document.getElementById("reset-button");
         this.reset_button.onclick = (() => this.reset()).bind(this);
+
+        this.split_elements = document.getElementsByClassName("splits");
 
         // start listening to keys after everything was loaded
         this.key_listener();
