@@ -7,16 +7,15 @@
     <body style="-webkit-app-region: drag">
     </body>
     <body>
+        <table id="table"></table>
         <div class="timer">
             <h1 id="time">00:00:00.000</h1>
             <div class="timer-buttons">
                 <button id="start-button">Start</button>
                 <button id="stop-button">Stop</button>
                 <button id="pause-button">Pause</button>
-                <br><br><br>
             </div>
         </div>
-        <table id="table"></table>
         <input type="text" id="user-input"><br>
         <div class="splits">
             <button id="append-button">Append</button>
@@ -27,12 +26,12 @@
             <button id="insert-below-button">Insert Below</button>
             <button id="reset-button">Reset</button>
         </div>
-        <script src="app.js"></script>
         <noscript>
-            <h1>
-                Error: Javascript is disabled
+            <h1 id="error">
                 <br>
+                Error: Javascript is disabled
             </h1>
         </noscript>
+        <script src="app.js"></script>
     </body>
 </html>

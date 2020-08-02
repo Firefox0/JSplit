@@ -37,7 +37,7 @@ class Timer {
         }
 
         setInterval((() => {
-
+        
             // if stop button was pressed
             if (!this.running) {
                 this.append_button.disabled = false;
@@ -124,7 +124,7 @@ class Timer {
         if (content) {
             // add row and keep count of splits
             let row = this.table.insertRow(row_index);
-            row.onclick = (row => this.select_row(row)).bind(this);
+            row.onclick = (() => this.select_row(row)).bind(this);
             let split_name = row.insertCell(0);
             split_name.innerHTML = content;
             // placeholder for split time
@@ -222,7 +222,24 @@ class Timer {
         this.insert_below_button.disabled = true;
     }
 
+    key_listener() {
+        // key listener
+        document.addEventListener("keydown", event => {
+            const key = event.key;
+            if (key == "1") {
+                this.start_timer();
+            }
+            else if (key == "3") {
+                this.stop_timer();
+            }
+            else if (key == "5") {
+                this.pause_timer();
+            }
+        });
+    }
+    
     main() {
+
         this.timer_time = document.getElementById("time");
         this.start_button = document.getElementById("start-button");
         // function(){} so js doesnt call the function, also bind it to class so it can 
@@ -261,6 +278,9 @@ class Timer {
 
         this.reset_button = document.getElementById("reset-button");
         this.reset_button.onclick = (() => this.reset()).bind(this);
+
+        // start listening to keys after everything was loaded
+        this.key_listener();
     }
 }
 

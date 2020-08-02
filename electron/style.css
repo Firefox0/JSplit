@@ -16,7 +16,12 @@ body {
 }
 
 #table {
-    border: 1px solid black;
+    /*border: 1px solid black;*/
+    /* prevent from touching the border */
+    padding: 5; 
+    /* prevent elements from almost touching each other */
+    border-spacing: 10;
+    width: 310;
 }
 
 #time {
@@ -38,7 +43,7 @@ body {
 }
 
 #user-input {
-    width: 310;
+    width: 307.5;
     height: 25;
     /* make it clickable */
     -webkit-app-region: no-drag;
