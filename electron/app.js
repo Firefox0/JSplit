@@ -231,7 +231,12 @@ class Timer {
             const key = event.key;
             console.log(key);
             if (key == "1") {
-                this.start_timer();
+                if (this.running) {
+                    this.split();
+                }
+                else {
+                    this.start_timer();
+                }
             }
             // toggle
             else if (key == "2") {
