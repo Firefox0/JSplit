@@ -22,6 +22,8 @@ body {
     /* prevent elements from almost touching each other */
     border-spacing: 10;
     width: 310;
+    /* prevent highlighting for smoother user experience while selecting rows */
+    user-select: none;
 }
 
 #time {
