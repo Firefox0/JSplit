@@ -236,7 +236,18 @@ class Timer {
 
         this.user_input.value = "";
     }
-
+    
+    toggle_buttons() {
+        let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
+        for (let i = 0; i < this.split_elements.length; i++) {
+            if (visible) {
+                this.split_elements[i].style.visibility = "hidden";
+            }
+            else {
+                this.split_elements[i].removeAttribute("style");
+            }
+        }
+    }
     key_listener() {
 
         // key listener
@@ -257,15 +268,7 @@ class Timer {
                         }
                         break;
                     case ("2"):
-                        let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
-                        for (let i = 0; i < this.split_elements.length; i++) {
-                            if (visible) {
-                                this.split_elements[i].style.visibility = "hidden";
-                            }
-                            else {
-                                this.split_elements[i].removeAttribute("style");
-                            }
-                        }
+                        this.toggle_buttons();
                         break;
                     case ("3"):
                         this.stop_timer();
