@@ -4,7 +4,7 @@ const {app, BrowserWindow, Menu, MenuItem, dialog, ipcMain} = require("electron"
 const path = require("path");
 // url module
 const url = require("url");
-const { readFileSync, writeFileSync } = require("fs");
+const {readFileSync} = require("fs");
 
 // init window object
 let win;

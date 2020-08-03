@@ -140,8 +140,10 @@ class Timer {
             split_name.innerHTML = content;
             // placeholder for split time
             row.insertCell(1);
-            // placeholder for saved time
+            // placeholder for comparison
             row.insertCell(2);
+            // placeholder for saved time
+            row.insertCell(3);
             // clear form
             this.user_input.value = "";
         }
@@ -178,8 +180,84 @@ class Timer {
         }
     }
 
+    time_to_ms(time) {
+        // for format 00:00:00.000
+
+        var new_parsed_times = [];
+        // get hours and minutes
+        let first_parse = time.split(":");
+        for (let i = 0; i < 2; i++) {
+            new_parsed_times[i] = parseInt(first_parse[i]);
+        }
+        // get seconds and milliseconds
+        let second_parse = first_parse[2].split(".");
+        new_parsed_times[2] = parseInt(second_parse[0]);
+        new_parsed_times[3] = parseInt(second_parse[1]);
+        // total time in ms
+        return new_parsed_times[0] * 3600000 + new_parsed_times[1] * 60000 
+                + new_parsed_times[2] * 1000 + new_parsed_times[3];
+    
+    }
+
+    ms_to_time(ms) {
+        let h = Math.floor(ms/1000/60/60);
+        let m = Math.floor((ms/1000/60/60 - h)*60);
+        let s = Math.floor(((ms/1000/60/60 - h)*60 - m)*60);
+        let ms_ = ms % 1000;
+
+        h = h < 10 ? "0" + h : h;
+        m = m < 10 ? "0" + m : m;
+        s = s < 10 ? "0" + s : s;
+
+        return h + ":" + m + ":" + s + "." + ms_;
+    }
+
+    remove_time_bloat(time) {
+        let parsed = time.split(":");
+        let h = parsed[0];
+        let m = parsed[1];
+        var final_time = parsed[2];
+        if (m !== "00") {
+            final_time = m + ":" + final_time;
+            if (h !== "00") {
+                final_time = h + ":" + final_time;
+            }
+        }
+        return final_time;
+    }
+
+    time_difference(time1, time2) {
+
+        // convert times to ms
+        let time1_ms = this.time_to_ms(time1);
+        let time2_ms = this.time_to_ms(time2);
+
+        var sign = "-";
+        var final_time_ms = null;
+        if (time1_ms < time2_ms) {
+            // time saved, dont change sign
+            final_time_ms = time2_ms - time1_ms;
+        }
+        else {
+            // time loss, change sign
+            sign = "+";
+            final_time_ms = time1_ms - time2_ms;
+        }
+
+        let time_diff = this.ms_to_time(time1_ms - time2_ms);
+        let clear_time = this.remove_time_bloat(time_diff); 
+        return sign + clear_time;
+    }
+
     split() {
+        // save current split time
         this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerHTML;
+        // calculate time difference
+        let diff_cell = this.table.rows[this.current_row].cells[2];
+        diff_cell.innerText = this.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
+                                        this.table.rows[this.current_row].cells[3].innerText);
+        diff_cell.style.color = diff_cell.innerText.includes("+") ? "red" : "green";
+
         this.current_row++;
         // pause when all splits are done
         if (this.current_row == this.table.rows.length) {
@@ -256,7 +334,12 @@ class Timer {
                 switch (key) {
                     case ("1"): 
                         if (this.running) {
-                            this.split();
+                            if (this.table.rows.length > 0) {
+                                this.split();
+                            }
+                            else {
+                                this.pause_timer();
+                            }
                         }
                         else {
                             this.start_timer();
@@ -304,7 +387,9 @@ class Timer {
                 row.insertCell(0).innerHTML = splits["split_names"][i];
                 // placeholder for future split times
                 row.insertCell(1).innerHTML = "-";
-                row.insertCell(2).innerHTML = splits["split_times"][i];
+                // placeholder for comparison
+                row.insertCell(2).innerHTML = "-";
+                row.insertCell(3).innerHTML = splits["split_times"][i];
             }
         }
     }
@@ -316,7 +401,6 @@ class Timer {
     }
 
     main() {
-
         this.timer_time = document.getElementById("time");
         this.start_button = document.getElementById("start-button");
         // function(){} so js doesnt call the function, also bind it to class so it can 
