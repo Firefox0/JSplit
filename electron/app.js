@@ -52,7 +52,7 @@ class Timer {
                     let dict = {};
                     dict.split_names = split_names;
                     dict.split_times = split_times;
-                    write_file(this.current_game + ".txt", JSON.stringify(game), "utf-8");
+                    write_file(this.current_game.innerText + ".txt", JSON.stringify(dict), "utf-8");
                 }
                 return;
             }
@@ -238,8 +238,13 @@ class Timer {
     }
 
     key_listener() {
+
         // key listener
         document.addEventListener("keydown", event => {
+            // so you can add listened keys to split names without starting the timer
+            if (this.user_input === document.activeElement) {
+                return;
+            }
             const key = event.key;
             if (key == "1") {
                 if (this.running) {
@@ -277,6 +282,27 @@ class Timer {
         this.current_game.innerHTML = this.user_input.value; 
         this.user_input.value = "";
         this.user_input.focus();
+    }
+
+    load_split(splits_json) {
+        if (splits_json) {
+            this.split_button.disabled = false;
+            let splits = JSON.parse(splits_json);
+            for (let i = 0; i < splits["split_names"].length; i++) {
+                // add row and keep count of splits
+                let row = this.table.insertRow(-1);
+                row.onclick = (() => this.select_row(row)).bind(this);
+                row.insertCell(0).innerHTML = splits["split_names"][i];
+                row.insertCell(1).innerHTML = splits["split_times"][i];
+                this.amount_splits++;
+            }
+        }
+    }
+
+    start_ipc() {
+        // request context menu item state
+        setInterval(() => ipc_send("get-load-split", ""), 10);
+        ipc_receive("get-load-split-response", this.load_split.bind(this));
     }
 
     main() {
@@ -326,6 +352,8 @@ class Timer {
         this.set_game_button = document.getElementById("set-game-button");
         this.set_game_button.onclick = (() => this.set_game()).bind(this);
 
+        // start inter process communication
+        this.start_ipc();
         // start listening to keys after everything was loaded
         this.key_listener();
     }
