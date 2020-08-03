@@ -140,6 +140,8 @@ class Timer {
             split_name.innerHTML = content;
             // placeholder for split time
             row.insertCell(1);
+            // placeholder for saved time
+            row.insertCell(2);
             // clear form
             this.user_input.value = "";
         }
@@ -300,7 +302,9 @@ class Timer {
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
                 row.insertCell(0).innerHTML = splits["split_names"][i];
-                row.insertCell(1).innerHTML = splits["split_times"][i];
+                // placeholder for future split times
+                row.insertCell(1).innerHTML = "-";
+                row.insertCell(2).innerHTML = splits["split_times"][i];
             }
         }
     }
