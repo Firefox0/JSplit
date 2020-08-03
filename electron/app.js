@@ -242,38 +242,43 @@ class Timer {
         // key listener
         document.addEventListener("keydown", event => {
             // so you can add listened keys to split names without starting the timer
-            if (this.user_input === document.activeElement) {
-                return;
-            }
             const key = event.key;
-            if (key == "1") {
-                if (this.running) {
-                    this.split();
-                }
-                else {
-                    this.start_timer();
-                }
-            }
-            // toggle
-            else if (key == "2") {
-                let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
-                for (let i = 0; i < this.split_elements.length; i++) {
-                    if (visible) {
-                        this.split_elements[i].style.visibility = "hidden";
-                    }
-                    else {
-                        this.split_elements[i].removeAttribute("style");
-                    }
-                }
-            }
-            else if (key == "3") {
-                this.stop_timer();
-            }
-            else if (key == "5") {
-                this.pause_timer();
-            }
-            else if (key == "Enter") {
+            if (key === "Enter") {
                 this.add_split();
+            }
+            else if (this.user_input !== document.activeElement) {
+                switch (key) {
+                    case ("1"): 
+                        if (this.running) {
+                            this.split();
+                        }
+                        else {
+                            this.start_timer();
+                        }
+                        break;
+                    case ("2"):
+                        let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
+                        for (let i = 0; i < this.split_elements.length; i++) {
+                            if (visible) {
+                                this.split_elements[i].style.visibility = "hidden";
+                            }
+                            else {
+                                this.split_elements[i].removeAttribute("style");
+                            }
+                        }
+                        break;
+                    case ("3"):
+                        this.stop_timer();
+                        break;
+                    case ("5"):
+                        this.pause_timer();
+                        break;
+                    case ("Enter"):
+                        this.add_split();
+                        break;
+                    default:
+                        console.log(key);
+                }
             }
         });
     }
