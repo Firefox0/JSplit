@@ -4,8 +4,6 @@ class Timer {
     running = false;
     // current row while splitting
     current_row = 0;
-    // total amount of splits
-    amount_splits = 0;
     // splits selected
     amount_selected = 0;
 
@@ -22,8 +20,8 @@ class Timer {
         // reset style colors in case rows are still select
         // (prevent issue where insert buttons only enable/disable when selection is done, 
         // but not when paused/stopped even though this would be valid)
-        if (this.amount_splits > 0) {
-            for (let i = 0; i < this.amount_splits; i++) {
+        if (this.table.rows.length > 0) {
+            for (let i = 0; i < this.table.rows.length; i++) {
                 this.table.rows[i].style.color = "";
             }
         }
@@ -43,7 +41,7 @@ class Timer {
             if (!this.running) {
                 this.append_button.disabled = false;
                 // save times
-                if (this.amount_splits > 0) {
+                if (this.table.rows.length > 0) {
                     var split_names = [], split_times = [];
                     for (let i = 0; i < this.table.rows.length; i++) {
                         split_names[i] = this.table.rows[i].cells[0].innerHTML;
@@ -142,7 +140,6 @@ class Timer {
             split_name.innerHTML = content;
             // placeholder for split time
             row.insertCell(1);
-            this.amount_splits++;
             // clear form
             this.user_input.value = "";
         }
@@ -183,17 +180,16 @@ class Timer {
         this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerHTML;
         this.current_row++;
         // pause when all splits are done
-        if (this.current_row == this.amount_splits) {
+        if (this.current_row == this.table.rows.length) {
             this.split_button.disabled = true;
             this.pause_timer();
         }
     }
 
     delete_split() {
-        for (let i = 0; i < this.amount_splits; i++) {
+        for (let i = 0; i < this.table.rows.length; i++) {
             if (this.table.rows[i].style.color == "black") {
                 this.table.deleteRow(i);
-                this.amount_splits--;
                 // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
                 i--;
             }
@@ -202,7 +198,7 @@ class Timer {
     }
 
     insert_above() {
-        for (let i = 0; i < this.amount_splits; i++) {
+        for (let i = 0; i < this.table.rows.length; i++) {
             if (this.table.rows[i].style.color == "black") {
                 this.add_split(i);
                 return;
@@ -211,7 +207,7 @@ class Timer {
     }
 
     insert_below() {
-        for (let i = 0; i < this.amount_splits; i++) {
+        for (let i = 0; i < this.table.rows.length; i++) {
             if (this.table.rows[i].style.color == "black") {
                 this.add_split(i + 1);
                 return;
@@ -223,11 +219,7 @@ class Timer {
         this.running = false;
         this.current_row = 0;
         this.amount_selected = 0;
-        for (let i = 0; i < this.amount_splits; i++) {
-            this.table.deleteRow(0);
-        }
-        this.amount_splits = 0;
-
+        this.reset_splits();
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
         this.delete_button.disabled = true;
@@ -248,6 +240,7 @@ class Timer {
             }
         }
     }
+
     key_listener() {
 
         // key listener
@@ -292,17 +285,22 @@ class Timer {
         this.user_input.focus();
     }
 
+    reset_splits() {
+        while (this.table.rows.length) {
+            this.table.deleteRow(0);
+        }
+    }
+
     load_split(splits_json) {
         if (splits_json) {
             this.split_button.disabled = false;
+            this.reset_splits();
             let splits = JSON.parse(splits_json);
             for (let i = 0; i < splits["split_names"].length; i++) {
-                // add row and keep count of splits
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
                 row.insertCell(0).innerHTML = splits["split_names"][i];
                 row.insertCell(1).innerHTML = splits["split_times"][i];
-                this.amount_splits++;
             }
         }
     }
