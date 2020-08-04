@@ -35,23 +35,15 @@ class Timer {
             this.pause_time = null;
         }
 
-        setInterval((() => {
-        
+        let interval_id = setInterval((() => {
+            console.log("here cuz");
             // if stop button was pressed
             if (!this.running) {
-                this.append_button.disabled = false;
-                // save times
-                if (this.table.rows.length > 0) {
-                    var split_names = [], split_times = [];
-                    for (let i = 0; i < this.table.rows.length; i++) {
-                        split_names[i] = this.table.rows[i].cells[0].innerHTML;
-                        split_times[i] = this.table.rows[i].cells[1].innerHTML;
-                    }
-                    let dict = {};
-                    dict.split_names = split_names;
-                    dict.split_times = split_times;
-                    write_file(this.current_game.innerText + ".txt", JSON.stringify(dict), "utf-8");
+                if (this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("-")) {
+                    console.log("ask " + this.table.rows[this.table.rows.length - 1].cells[2].innerText);
+                    this.ask_save_split();
                 }
+                clearInterval(interval_id);
                 return;
             }
             // get current time
@@ -139,11 +131,11 @@ class Timer {
             let split_name = row.insertCell(0);
             split_name.innerHTML = content;
             // placeholder for split time
-            row.insertCell(1);
+            row.insertCell(1).innerText = "/";
             // placeholder for comparison
-            row.insertCell(2);
+            row.insertCell(2).innerText = "/";
             // placeholder for saved time
-            row.insertCell(3);
+            row.insertCell(3).innerText = "/";
             // clear form
             this.user_input.value = "";
         }
@@ -251,12 +243,15 @@ class Timer {
 
     split() {
         // save current split time
-        this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerHTML;
-        // calculate time difference
-        let diff_cell = this.table.rows[this.current_row].cells[2];
-        diff_cell.innerText = this.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
-                                        this.table.rows[this.current_row].cells[3].innerText);
-        diff_cell.style.color = diff_cell.innerText.includes("+") ? "red" : "green";
+        this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerText;
+        // calculate time difference, but only if previous times exist
+        let previous_time = this.table.rows[this.current_row].cells[3].innerText;
+        if (previous_time !== "/") {
+            let diff_cell = this.table.rows[this.current_row].cells[2];
+            diff_cell.innerText = this.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
+                                            previous_time);
+            diff_cell.style.color = diff_cell.innerText.includes("+") ? "red" : "green";
+        }
 
         this.current_row++;
         // pause when all splits are done
@@ -386,11 +381,46 @@ class Timer {
                 row.onclick = (() => this.select_row(row)).bind(this);
                 row.insertCell(0).innerHTML = splits["split_names"][i];
                 // placeholder for future split times
-                row.insertCell(1).innerHTML = "-";
+                row.insertCell(1).innerHTML = "/";
                 // placeholder for comparison
-                row.insertCell(2).innerHTML = "-";
+                row.insertCell(2).innerHTML = "/";
                 row.insertCell(3).innerHTML = splits["split_times"][i];
             }
+        }
+    }
+
+    ask_save_split() {
+        ipc_send("get-save-split", "");
+    }
+    
+    save_split(state) {
+        // if yes was pressed
+        if (state == "0") {
+            this.append_button.disabled = false;
+            // save times
+            if (this.table.rows.length > 0) {
+                var split_names = [], split_times = [];
+                for (let i = 0; i < this.table.rows.length; i++) {
+                    split_names[i] = this.table.rows[i].cells[0].innerHTML;
+                    split_times[i] = this.table.rows[i].cells[1].innerHTML;
+                }
+                let dict = {};
+                dict.split_names = split_names;
+                dict.split_times = split_times;
+                write_file(this.current_game.innerText + ".txt", JSON.stringify(dict), "utf-8");
+            }
+        }
+        this.current_times_to_previous();
+    }
+
+    current_times_to_previous() {
+        // move the current times to the previous times
+        for (let i = 0; i < this.table.rows.length; i++) {
+            // copy content of current time to previous time
+            this.table.rows[i].cells[3].innerText = this.table.rows[i].cells[1].innerText;
+            // clear current time and time comparisons
+            this.table.rows[i].cells[1].innerText = "";
+            this.table.rows[i].cells[2].innerText = "";
         }
     }
 
@@ -398,6 +428,7 @@ class Timer {
         // request context menu item state
         setInterval(() => ipc_send("get-load-split", ""), 10);
         ipc_receive("get-load-split-response", this.load_split.bind(this));
+        ipc_receive("get-save-split-response", this.save_split.bind(this));
     }
 
     main() {
@@ -405,48 +436,48 @@ class Timer {
         this.start_button = document.getElementById("start-button");
         // function(){} so js doesnt call the function, also bind it to class so it can 
         // access class attributes
-        this.start_button.onclick = (() => this.start_timer()).bind(this);
+        this.start_button.onclick = this.start_timer.bind(this);
 
         this.stop_button = document.getElementById("stop-button");
-        this.stop_button.onclick = (() => this.stop_timer()).bind(this);
+        this.stop_button.onclick = this.stop_timer.bind(this);
         this.stop_button.disabled = true;
 
         this.pause_button = document.getElementById("pause-button");
-        this.pause_button.onclick = (() => this.pause_timer()).bind(this);
+        this.pause_button.onclick = this.pause_timer.bind(this);
         this.pause_button.disabled = true;
 
         this.table = document.getElementById("table");
         this.user_input = document.getElementById("user-input");
 
         this.append_button = document.getElementById("append-button");
-        this.append_button.onclick = (() => this.add_split()).bind(this);
+        this.append_button.onclick = this.add_split.bind(this);
 
         this.split_button = document.getElementById("split-button");
-        this.split_button.onclick = (() => this.split()).bind(this);
+        this.split_button.onclick = this.split.bind(this);
         this.split_button.disabled = true;
 
         this.delete_button = document.getElementById("delete-button");
-        this.delete_button.onclick = (() => this.delete_split()).bind(this);
+        this.delete_button.onclick = this.delete_split.bind(this);
         this.delete_button.disabled = true;
 
         this.insert_above_button = document.getElementById("insert-above-button");
-        this.insert_above_button.onclick = (() => this.insert_above()).bind(this);
+        this.insert_above_button.onclick = this.insert_above.bind(this);
         this.insert_above_button.disabled = true;
 
         this.insert_below_button = document.getElementById("insert-below-button");
-        this.insert_below_button.onclick = (() => this.insert_below()).bind(this);
+        this.insert_below_button.onclick = this.insert_below.bind(this);
         this.insert_below_button.disabled = true;
 
         this.reset_button = document.getElementById("reset-button");
-        this.reset_button.onclick = (() => this.reset()).bind(this);
+        this.reset_button.onclick = this.reset.bind(this);
 
         this.split_elements = document.getElementsByClassName("splits");
 
         this.current_game = document.getElementById("game");
         this.set_game_button = document.getElementById("set-game-button");
-        this.set_game_button.onclick = (() => this.set_game()).bind(this);
+        this.set_game_button.onclick = this.set_game.bind(this);
 
-        // start inter process communication
+        // start context menu inter process communication
         this.start_ipc();
         // start listening to keys after everything was loaded
         this.key_listener();
