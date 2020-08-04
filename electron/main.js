@@ -68,6 +68,13 @@ function load_split() {
     }
 }
 
+function save_split(message) {
+    return dialog.showMessageBoxSync({
+        type: "question",
+        buttons: ["Yes", "No"],
+        message: "It seems that you have beat your previous time. Save?"
+    })
+}
 // run create window function
 app.on("ready", () => create_window())
 
@@ -90,3 +97,8 @@ ipcMain.on("get-load-split", (event, arg) => {
         event.sender.send("get-load-split-response", load_split_t);
     }
 });
+
+
+ipcMain.on("get-save-split", (event, arg) => {
+    return event.sender.send("get-save-split-response", save_split());
+})

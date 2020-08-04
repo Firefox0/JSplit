@@ -36,11 +36,9 @@ class Timer {
         }
 
         let interval_id = setInterval((() => {
-            console.log("here cuz");
             // if stop button was pressed
             if (!this.running) {
                 if (this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("-")) {
-                    console.log("ask " + this.table.rows[this.table.rows.length - 1].cells[2].innerText);
                     this.ask_save_split();
                 }
                 clearInterval(interval_id);
@@ -419,8 +417,8 @@ class Timer {
             // copy content of current time to previous time
             this.table.rows[i].cells[3].innerText = this.table.rows[i].cells[1].innerText;
             // clear current time and time comparisons
-            this.table.rows[i].cells[1].innerText = "";
-            this.table.rows[i].cells[2].innerText = "";
+            this.table.rows[i].cells[1].innerText = "/";
+            this.table.rows[i].cells[2].innerText = "/";
         }
     }
 
