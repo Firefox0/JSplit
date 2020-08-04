@@ -41,6 +41,7 @@ class Timer {
                 if (this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("-")) {
                     this.ask_save_split();
                 }
+                // end interval, so it doesnt repeatedly ask if you want to save, also stop looping even if no
                 clearInterval(interval_id);
                 return;
             }
@@ -448,7 +449,7 @@ class Timer {
         this.user_input = document.getElementById("user-input");
 
         this.append_button = document.getElementById("append-button");
-        this.append_button.onclick = this.add_split.bind(this);
+        this.append_button.onclick = (() => this.add_split()).bind(this);
 
         this.split_button = document.getElementById("split-button");
         this.split_button.onclick = this.split.bind(this);
