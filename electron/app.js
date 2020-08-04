@@ -1,3 +1,5 @@
+import * as time from "./time";
+
 class Timer {
 
     // timer running
@@ -40,9 +42,9 @@ class Timer {
             if (!this.running) {
                 // save as long as no time loss (time save or no previous time)
                 if (!this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
-                    this.ask_save_split();
+                    ipc.request_save_split();
                 }
-                // end interval, so it doesnt repeatedly ask if you want to save, also stop looping even if no
+                // end interval, so it doesnt repeatedly request if you want to save, also stop looping even if no
                 clearInterval(interval_id);
                 return;
             }
@@ -50,10 +52,10 @@ class Timer {
             let now = new Date().getTime();
             let difference = now - this.start_time;
 
-            let hours = this.get_hours(difference);
-            let minutes = this.get_minutes(difference);
-            let seconds = this.get_seconds(difference);
-            let milliseconds = this.get_milliseconds(difference);
+            let hours = time.get_hours(difference);
+            let minutes = time.get_minutes(difference);
+            let seconds = time.get_seconds(difference);
+            let milliseconds = time.get_milliseconds(difference);
 
             // display new time
             this.timer_time.innerHTML = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
@@ -77,51 +79,6 @@ class Timer {
         this.pause_time = new Date().getTime();
     }
 
-    get_hours(time, add_zero = true) {
-        let hours =  Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        if (add_zero) {
-            hours = this.insert_zeros(hours);
-        }
-        return hours;
-    }
-
-    get_minutes(time, add_zero = true) {
-        let minutes =  Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-        if (add_zero) {
-            minutes = this.insert_zeros(minutes);
-        }
-        return minutes;
-    }
-
-    get_seconds(time, add_zero = true) {
-        let seconds = Math.floor((time % (1000 * 60)) / 1000);
-        if (add_zero) {
-            seconds = this.insert_zeros(seconds);
-        }
-        return seconds;
-    }
-
-    get_milliseconds(time, add_zero = true) {
-        let milliseconds = Math.floor(time % 1000);
-        if (add_zero) {
-            milliseconds = this.insert_zeros(milliseconds, 3);
-        }
-        return milliseconds;
-    }
-
-    insert_zeros(num, length = 2) {
-        // insert zeros to the beginning of num until length reached
-        let num_length = num.toString().length;
-        let difference = length - num_length;
-        if (difference > 0) {
-            for (let i = 0; i < difference; i++) {
-                num = "0" + num;
-            }
-        }
-        return num;
-    }
-
-    
     select_row(e) {
         // default color is empty even though it looks white
         if (e.style.color != "black") {
@@ -170,56 +127,6 @@ class Timer {
         
     }
     
-    ms_to_time(ms) {
-        let h = Math.floor(ms/1000/60/60);
-        let m = Math.floor((ms/1000/60/60 - h)*60);
-        let s = Math.floor(((ms/1000/60/60 - h)*60 - m)*60);
-        let ms_ = ms % 1000;
-        
-        h = h < 10 ? "0" + h : h;
-        m = m < 10 ? "0" + m : m;
-        s = s < 10 ? "0" + s : s;
-        
-        return h + ":" + m + ":" + s + "." + ms_;
-    }
-    
-    remove_time_bloat(time) {
-        let parsed = time.split(":");
-        let h = parsed[0];
-        let m = parsed[1];
-        var final_time = parsed[2];
-        if (m !== "00") {
-            final_time = m + ":" + final_time;
-            if (h !== "00") {
-                final_time = h + ":" + final_time;
-            }
-        }
-        return final_time;
-    }
-    
-    time_difference(time1, time2) {
-        
-        // convert times to ms
-        let time1_ms = this.time_to_ms(time1);
-        let time2_ms = this.time_to_ms(time2);
-        
-        var sign = "-";
-        var final_time_ms = null;
-        if (time1_ms < time2_ms) {
-            // time saved, dont change sign
-            final_time_ms = time2_ms - time1_ms;
-        }
-        else {
-            // time loss, change sign
-            sign = "+";
-            final_time_ms = time1_ms - time2_ms;
-        }
-        
-        let time_diff = this.ms_to_time(time1_ms - time2_ms);
-        let clear_time = this.remove_time_bloat(time_diff); 
-        return sign + clear_time;
-    }
-    
     split() {
         // save current split time
         this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerText;
@@ -227,57 +134,57 @@ class Timer {
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
             let diff_cell = this.table.rows[this.current_row].cells[2];
-            diff_cell.innerText = this.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
+            diff_cell.innerText = time.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
                 previous_time);
                 diff_cell.style.color = diff_cell.innerText.includes("+") ? "red" : "green";
-            }
+        }
             
-            this.current_row++;
-            // pause when all splits are done
-            if (this.current_row == this.table.rows.length) {
-                this.split_button.disabled = true;
-                this.pause_timer();
-            }
+        this.current_row++;
+        // pause when all splits are done
+        if (this.current_row == this.table.rows.length) {
+            this.split_button.disabled = true;
+            this.pause_timer();
         }
+    }
 
-        add_split(row_index = -1) {
-            this.split_button.disabled = false;
-            let content = this.user_input.value;
-            if (content) {
-                // add row and keep count of splits
-                let row = this.table.insertRow(row_index);
-                row.onclick = (() => this.select_row(row)).bind(this);
-                let split_name = row.insertCell(0);
-                split_name.innerHTML = content;
-                // placeholder for split time
-                row.insertCell(1).innerText = "/";
-                // placeholder for comparison
-                row.insertCell(2).innerText = "/";
-                // placeholder for saved time
-                row.insertCell(3).innerText = "/";
-                // clear form
-                this.user_input.value = "";
-            }
-            // focus after add was pressed
-            this.user_input.focus();
+    add_split(row_index = -1) {
+        this.split_button.disabled = false;
+        let content = this.user_input.value;
+        if (content) {
+            // add row and keep count of splits
+            let row = this.table.insertRow(row_index);
+            row.onclick = (() => this.select_row(row)).bind(this);
+            let split_name = row.insertCell(0);
+            split_name.innerHTML = content;
+            // placeholder for split time
+            row.insertCell(1).innerText = "/";
+            // placeholder for comparison
+            row.insertCell(2).innerText = "/";
+            // placeholder for saved time
+            row.insertCell(3).innerText = "/";
+            // clear form
+            this.user_input.value = "";
         }
+        // focus after add was pressed
+        this.user_input.focus();
+    }
         
-        delete_split() {
-            for (let i = 0; i < this.table.rows.length; i++) {
-                if (this.table.rows[i].style.color == "black") {
-                    this.table.deleteRow(i);
-                    // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
-                    i--;
-                }
+    delete_split() {
+        for (let i = 0; i < this.table.rows.length; i++) {
+            if (this.table.rows[i].style.color == "black") {
+                this.table.deleteRow(i);
+                // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
+                i--;
             }
-            this.delete_button.disabled = true;
         }
+        this.delete_button.disabled = true;
+    }
         
-        insert_above() {
-            for (let i = 0; i < this.table.rows.length; i++) {
-                if (this.table.rows[i].style.color == "black") {
-                this.add_split(i);
-                return;
+    insert_above() {
+        for (let i = 0; i < this.table.rows.length; i++) {
+            if (this.table.rows[i].style.color == "black") {
+            this.add_split(i);
+            return;
             }
         }
     }
@@ -390,22 +297,33 @@ class Timer {
         }
     }
 
-    ask_save_split() {
+    start_ipc() {
+        // request context menu item state
+        setInterval(() => ipc_send("get-load-split", ""), 10);
+        // listen on specific message identifies
+        ipc_receive("get-load-split-response", this.load_split.bind(this));
+        ipc_receive("get-save-split-response", this.save_split.bind(this));
+        ipc_receive("get-directory-response", this.pick_directory.bind(this));
+    }
+    
+    request_save_split() {
+        // request to show dialog
         ipc_send("get-save-split", "");
     }
     
-    save_split(state) {
-        // if yes was pressed
-        if (state == "0") {
-            this.ask_save_directory();
-        }
-    }
-
-    ask_save_directory() {
+    request_pick_directory() {
         ipc_send("get-directory", "");
     }
 
-    save_directory(directory) {
+    save_split(state) {
+        // if yes was pressed
+        if (state == "0") {
+            // request to choose directory
+            ipc.request_pick_directory();
+        }
+    }
+
+    pick_directory(directory) {
         // only if directory was chosen, maybe remember this
         if (directory) {
             this.append_button.disabled = false;
@@ -435,15 +353,6 @@ class Timer {
             this.table.rows[i].cells[1].innerText = "/";
             this.table.rows[i].cells[2].innerText = "/";
         }
-    }
-
-    start_ipc() {
-        // request context menu item state
-        setInterval(() => ipc_send("get-load-split", ""), 10);
-        // listen on specific message identifies
-        ipc_receive("get-load-split-response", this.load_split.bind(this));
-        ipc_receive("get-save-split-response", this.save_split.bind(this));
-        ipc_receive("get-directory-response", this.save_directory.bind(this));
     }
 
     main() {
@@ -492,8 +401,9 @@ class Timer {
         this.set_game_button = document.getElementById("set-game-button");
         this.set_game_button.onclick = this.set_game.bind(this);
 
-        // start context menu inter process communication
+        // start inter process communication (receiving)
         this.start_ipc();
+
         // start listening to keys after everything was loaded
         this.key_listener();
     }
