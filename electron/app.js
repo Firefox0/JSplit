@@ -287,6 +287,7 @@ class Timer {
             this.split_button.disabled = false;
             this.reset_splits();
             let splits = JSON.parse(splits_json);
+            this.current_game.innerText = splits["game_name"];
             for (let i = 0; i < splits["split_names"].length; i++) {
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
