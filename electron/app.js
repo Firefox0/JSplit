@@ -1,4 +1,4 @@
-import * as time from "./time";
+import * as time from "./time.js";
 
 class Timer {
 
@@ -40,9 +40,12 @@ class Timer {
         let interval_id = setInterval((() => {
             // if stop button was pressed
             if (!this.running) {
-                // save as long as no time loss (time save or no previous time)
-                if (!this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
-                    ipc.request_save_split();
+                // if splits exist
+                if (this.table.rows.length > 0) {
+                    // save as long as no time loss (time save or no previous time)
+                    if (!this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
+                        this.request_save_split();
+                    }
                 }
                 // end interval, so it doesnt repeatedly request if you want to save, also stop looping even if no
                 clearInterval(interval_id);
@@ -319,7 +322,7 @@ class Timer {
         // if yes was pressed
         if (state == "0") {
             // request to choose directory
-            ipc.request_pick_directory();
+            this.request_pick_directory();
         }
     }
 
@@ -330,15 +333,15 @@ class Timer {
             // save times
             if (this.table.rows.length > 0) {
                 var split_names = [], split_times = [];
-                for (let i = 0; i < this.table.rows.length; i++) {
+                for (let i = 0; i < this.table.rows.length; i++) {                    
                     split_names[i] = this.table.rows[i].cells[0].innerHTML;
                     split_times[i] = this.table.rows[i].cells[1].innerHTML;
                 }
                 let dict = {};
-                let game = {};
-                dict.split_names = split_names;
-                dict.split_times = split_times;
-                write_file(directory + "\\" +  this.current_game.innerText + ".json", JSON.stringify(dict), "utf-8");
+                dict["game_name"] = this.current_game.innerText;
+                dict["split_names"] = split_names;
+                dict["split_times"] = split_times;
+                write_file(directory, JSON.stringify(dict), "utf-8");
                 this.current_times_to_previous();
             }
         }
