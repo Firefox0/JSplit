@@ -57,7 +57,7 @@ function create_window() {
 function load_split() {
     const file = dialog.showOpenDialogSync(win, {
         properties: ["openFile"]
-    })
+    });
 
     if (!file) {
         return null;
@@ -69,12 +69,20 @@ function load_split() {
 }
 
 function save_split(message) {
-    return dialog.showMessageBoxSync({
+    return dialog.showMessageBoxSync(win, {
         type: "question",
         buttons: ["Yes", "No"],
-        message: "It seems that you have beat your previous time. Save?"
+        message: message
     })
 }
+
+// choose directory
+function pick_directory(message) {
+    return dialog.showOpenDialogSync(win, {
+        properties: ["openDirectory"]
+    })
+} 
+
 // run create window function
 app.on("ready", () => create_window())
 
@@ -98,7 +106,12 @@ ipcMain.on("get-load-split", (event, arg) => {
     }
 });
 
-
+// open dialog to save split
 ipcMain.on("get-save-split", (event, arg) => {
-    return event.sender.send("get-save-split-response", save_split());
+    return event.sender.send("get-save-split-response", save_split(
+            "It seems that you have beat your previous time. Save?"));
+})
+
+ipcMain.on("get-directory", (event, arg) => {
+    return event.sender.send("get-directory-response", pick_directory());
 })
