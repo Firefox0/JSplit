@@ -11,10 +11,9 @@ let win;
 
 var load_split_t = null; 
 
-function create_window() {
+let json_filter = [{name: "json", extensions: ["json"]}];
 
-    // remove menu bar
-    //Menu.setApplicationMenu(null);
+function create_window() {
 
     // create browser window
     win = new BrowserWindow({width: 400, height: 300, 
@@ -56,6 +55,7 @@ function create_window() {
 
 function load_split() {
     const file = dialog.showOpenDialogSync(win, {
+        filter: json_filter,
         properties: ["openFile"]
     });
 
@@ -78,9 +78,17 @@ function save_split(message) {
 
 // choose directory
 function pick_directory(message) {
-    return dialog.showOpenDialogSync(win, {
-        properties: ["openDirectory"]
+    const files = dialog.showOpenDialogSync(win, {
+        filters: json_filter,
+        properties: ["promptToCreate"]
     })
+    if (!files) {
+        return;
+    }
+    else {
+        // array, return first file
+        return files[0];
+    }
 } 
 
 // run create window function
