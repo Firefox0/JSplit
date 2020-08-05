@@ -73,6 +73,12 @@ class Timer {
         this.running = false;
         this.start_time = null;
         this.timer_time.innerHTML = "00:00:00.000";
+        // clear current times
+        for (let i = 0; i < this.table.rows.length; i++) {
+            this.table.rows[i].cells[1].innerText = "/";
+            this.table.rows[i].cells[2].innerText = "/";
+            this.table.rows[i].cells[2].style.color = "";
+        }
     }
 
     pause_timer() {
@@ -201,7 +207,7 @@ class Timer {
         this.running = false;
         this.current_row = 0;
         this.amount_selected = 0;
-        this.reset_splits();
+        this.delete_splits();
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
         this.delete_button.disabled = true;
@@ -269,7 +275,7 @@ class Timer {
         this.user_input.focus();
     }
 
-    reset_splits() {
+    delete_splits() {
         while (this.table.rows.length) {
             this.table.deleteRow(0);
         }
@@ -280,7 +286,7 @@ class Timer {
     load_split(splits_json) {
         if (splits_json) {
             this.split_button.disabled = false;
-            this.reset_splits();
+            this.delete_splits();
             let splits = JSON.parse(splits_json);
             this.current_game.innerText = splits["game_name"];
             for (let i = 0; i < splits["split_names"].length; i++) {
