@@ -69,7 +69,9 @@ class Timer {
     
     split() {
         // save current split time
-        this.table.rows[this.current_row].cells[1].innerText = this.timer_time.innerText;
+        let current_time = this.timer_time.innerText;
+        this.table.rows[this.current_row].cells[1].innerText = time.remove_time_bloat(current_time);
+        
         // calculate time difference, but only if previous times exist
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
@@ -115,12 +117,12 @@ class Timer {
             row.onclick = (() => this.select_row(row)).bind(this);
             let split_name = row.insertCell(0);
             split_name.innerText = content;
-            // placeholder for split time
-            row.insertCell(1).innerText = "/";
-            // placeholder for comparison
-            row.insertCell(2).innerText = "/";
-            // placeholder for saved time
-            row.insertCell(3).innerText = "/";
+            // create cells for current time, comparison and previous time
+            for (let i = 1; i <= 3; i++) {
+                let new_row = row.insertCell(i);
+                new_row.style.textAlign = "right"
+                new_row.innerText = "/";
+            }
             // clear form
             this.user_input.value = "";
         }
@@ -342,11 +344,18 @@ class Timer {
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
                 row.insertCell(0).innerText = splits["split_names"][i];
-                // placeholder for future split times
-                row.insertCell(1).innerText = "/";
-                // placeholder for comparison
-                row.insertCell(2).innerText = "/";
-                row.insertCell(3).innerText = splits["split_times"][i];
+
+                let current_time_cell = row.insertCell(1);
+                current_time_cell.style.textAlign = "right";
+                current_time_cell.innerText = "/";
+
+                let comparison_cell = row.insertCell(2);
+                comparison_cell.style.textAlign = "right";
+                comparison_cell.innerText = "/";
+                
+                let previous_time_cell = row.insertCell(3);
+                previous_time_cell.style.textAlign = "right";
+                previous_time_cell.innerText = splits["split_times"][i];
             }
             this.set_transparent_background();
         }
