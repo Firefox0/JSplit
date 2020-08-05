@@ -8,12 +8,9 @@ const {readFileSync} = require("fs");
 
 // init window object
 let win;
-
-
 var loaded_split = null;
 // background image
 var image_path = null;
-
 let json_filter = [{name: "json", extensions: ["json"]}];
 
 function create_window() {
@@ -29,17 +26,10 @@ function create_window() {
             preload: path.join(__dirname, "preload.js")
         } 
     });
-
+    
     // disable menu bar
     win.setMenu(null);
-
-    // load index.html
-    win.loadURL(url.format({
-        pathname: path.join(__dirname, "index.html"),
-        protocol: "file:",
-        slashes: true
-    }));
-
+    
     // create custom context menu
     const menu = new Menu();
     menu.append(new MenuItem({
@@ -48,22 +38,28 @@ function create_window() {
             loaded_split = load_split();
         }
     }));
-
+    
     menu.append(new MenuItem({
         label: "Set Background",
         click: () => {
             image_path = pick_image();
         }
     }));
-
     
     // attach context menu to app
     win.webContents.on("context-menu", (e, params) => {
         menu.popup(win, params.x, params.y)
     });
-
+    
     // open dev tools on start
-    //win.webContents.openDevTools();
+    win.webContents.openDevTools();
+    
+    // load index.html
+    win.loadURL(url.format({
+        pathname: path.join(__dirname, "index.html"),
+        protocol: "file:",
+        slashes: true
+    }));
 
     win.on("closed", () => win = null);
 }
@@ -122,17 +118,6 @@ function pick_image(message) {
     }
 }
 
-// run create window function
-app.on("ready", () => create_window())
-
-// quit when all windows are closed
-app.on("window-all-closed", () => {
-    // check for macos, !== for value and type
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
-})
-
 // send context menu item state
 ipcMain.on("get-load-split", (event, arg) => {
     if (loaded_split) {
@@ -144,9 +129,9 @@ ipcMain.on("get-load-split", (event, arg) => {
 // open dialog to save split
 ipcMain.on("get-save-split", (event, arg) => {
     event.sender.send("get-save-split-response", save_split(
-            "It seems that you have beat your previous time. Save?"));
-})
-
+        "It seems that you have beat your previous time. Save?"));
+    })
+    
 ipcMain.on("get-directory", (event, arg) => {
     event.sender.send("get-directory-response", pick_directory());
 })
@@ -155,5 +140,16 @@ ipcMain.on("get-image-path", (event, arg) => {
     if (image_path) {
         event.sender.send("get-image-path-response", image_path);
         image_path = null;
+    }
+})
+
+// run create window function
+app.on("ready", () => create_window())
+
+// quit when all windows are closed
+app.on("window-all-closed", () => {
+    // check for macos, !== for value and type
+    if (process.platform !== "darwin") {
+        app.quit();
     }
 })
