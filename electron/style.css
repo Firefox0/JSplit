@@ -10,7 +10,9 @@ body {
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    /*
     background: linear-gradient(rgb(47, 150, 163), rgb(48, 62, 143));
+    */
     font-family: sans-serif;
     color: white;
 }
@@ -24,6 +26,10 @@ body {
     width: 310;
     /* prevent highlighting for smoother user experience while selecting rows */
     user-select: none;
+    /* make table more visible by adding a black transparent background" */
+    background: rgba(0, 0, 0, 0.25);
+    /* auto width (for background) */
+    width: auto;
 }
 
 #time {
