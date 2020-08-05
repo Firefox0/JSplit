@@ -19,7 +19,11 @@ let json_filter = [{name: "json", extensions: ["json"]}];
 function create_window() {
 
     // create browser window
-    win = new BrowserWindow({width: 400, height: 300, 
+    win = new BrowserWindow({
+        minWidth: 400, 
+        minHeight: 300, 
+        width: 400,
+        height: 300,
         // frame: false, // disabling because of issues with dragging and context menu
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
@@ -59,7 +63,7 @@ function create_window() {
     });
 
     // open dev tools on start
-    win.webContents.openDevTools();
+    //win.webContents.openDevTools();
 
     win.on("closed", () => win = null);
 }
