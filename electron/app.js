@@ -132,6 +132,15 @@ class Timer {
         }
     }
 
+    set_transparent_background() {
+        // set background when there is atleast one split (prevent black spot)
+        if (this.table.rows.length > 0) {
+            if (this.table.style.background == "transparent") {
+                this.table.style.background = "rgba(0, 0, 0, 0.25)";
+            }
+        }
+    }
+
     add_split(row_index = -1) {
         this.split_button.disabled = false;
         let content = this.user_input.value;
@@ -152,8 +161,9 @@ class Timer {
         }
         // focus after add was pressed
         this.user_input.focus();
+        this.set_transparent_background();
     }
-        
+
     delete_split() {
         for (let i = 0; i < this.table.rows.length; i++) {
             if (this.table.rows[i].style.color == "black") {
@@ -163,6 +173,10 @@ class Timer {
             }
         }
         this.delete_button.disabled = true;
+        // set transparent background when no splits were created (prevent black spot)
+        if (this.table.rows.length == 0) {
+            this.table.style.background = transparent;
+        }
     }
         
     insert_above() {
@@ -262,6 +276,8 @@ class Timer {
         while (this.table.rows.length) {
             this.table.deleteRow(0);
         }
+        // prevent black spot
+        this.table.style.background = "transparent";
     }
 
     load_split(splits_json) {
@@ -280,6 +296,7 @@ class Timer {
                 row.insertCell(2).innerHTML = "/";
                 row.insertCell(3).innerHTML = splits["split_times"][i];
             }
+            this.set_transparent_background();
         }
     }
 
