@@ -71,7 +71,7 @@ class Timer {
         // save current split time
         let current_time = this.timer_time.innerText;
         this.table.rows[this.current_row].cells[1].innerText = time.remove_time_bloat(current_time);
-        
+
         // calculate time difference, but only if previous times exist
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
@@ -99,6 +99,8 @@ class Timer {
         this.start_time = null;
         this.timer_time.innerText = "00:00:00.000";
         this.current_row = 0;
+        
+        this.clear_run();
     }
     
     pause_timer() {
