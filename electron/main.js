@@ -10,6 +10,8 @@ const {readFileSync} = require("fs");
 let win;
 
 var load_split_t = null; 
+// background image
+var image_path = null;
 
 let json_filter = [{name: "json", extensions: ["json"]}];
 
@@ -41,6 +43,14 @@ function create_window() {
             load_split_t = true;
         }
     }));
+
+    menu.append(new MenuItem({
+        label: "Set Background",
+        click: () => {
+            image_path = pick_image();
+        }
+    }));
+
     
     // attach context menu to app
     win.webContents.on("context-menu", (e, params) => {
@@ -91,6 +101,22 @@ function pick_directory(message) {
     }
 } 
 
+function pick_image(message) {
+    const files = dialog.showOpenDialogSync(win, {
+        filters: [{name: "Image", 
+                extensions: ["png", "jpg", "jpeg"]
+        }],
+        properties: ["promptToCreate"]
+    })
+    if (!files) {
+        return;
+    }
+    else {
+        // array, return first file
+        return files[0];
+    }
+}
+
 // run create window function
 app.on("ready", () => create_window())
 
@@ -122,4 +148,11 @@ ipcMain.on("get-save-split", (event, arg) => {
 
 ipcMain.on("get-directory", (event, arg) => {
     return event.sender.send("get-directory-response", pick_directory());
+})
+
+ipcMain.on("get-image-path", (event, arg) => {
+    let temp = image_path;
+    image_path = null;
+    return event.sender.send("get-image-path-response", temp);
+
 })
