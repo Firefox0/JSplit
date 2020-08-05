@@ -71,7 +71,7 @@ export function ms_to_time(ms) {
     m = insert_zeros(m, 2);
     s = insert_zeros(s, 2);
     ms_ = insert_zeros(ms_, 3);
-    
+
     return h + ":" + m + ":" + s + "." + ms_;
 }
 
@@ -90,11 +90,9 @@ export function remove_time_bloat(time) {
 }
 
 export function time_difference(time1, time2) {
-    console.log("[Normal] first time: " + time1 + " second time: " + time2);
     // convert times to ms
     let time1_ms = time_to_ms(time1);
     let time2_ms = time_to_ms(time2);
-    console.log("[MS] first time: " + time1_ms + " second time: " + time2_ms);
 
     var sign = "-";
     var final_time_ms = null;
