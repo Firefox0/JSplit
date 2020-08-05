@@ -256,9 +256,6 @@ class Timer {
                     case ("5"):
                         this.pause_timer();
                         break;
-                    case ("Enter"):
-                        this.add_split();
-                        break;
                     default:
                         console.log(key);
                 }
@@ -409,7 +406,7 @@ class Timer {
         this.reset_button = document.getElementById("reset-button");
         this.reset_button.onclick = this.reset.bind(this);
 
-        this.split_elements = document.getElementsByClassName("splits");
+        this.split_elements = document.getElementsByClassName("split-buttons");
 
         this.current_game = document.getElementById("game");
         this.set_game_button = document.getElementById("set-game-button");
