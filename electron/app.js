@@ -351,6 +351,7 @@ class Timer {
             this.request_pick_directory();
         }
         else {
+            // clear run if not deciding to save
             this.clear_run();
         }
     }
@@ -373,6 +374,7 @@ class Timer {
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.current_times_to_previous();
+            // clear run after saving
             this.clear_run();
         }
     }
@@ -380,11 +382,14 @@ class Timer {
     current_times_to_previous() {
         // move the current times to the previous times
         for (let i = 0; i < this.table.rows.length; i++) {
-            // copy content of current time to previous time
-            this.table.rows[i].cells[3].innerText = this.table.rows[i].cells[1].innerText;
-            // clear current time and time comparisons
-            this.table.rows[i].cells[1].innerText = "/";
-            this.table.rows[i].cells[2].innerText = "/";
+            // only move valid times
+            if (!this.table.rows[i].cells[1].innerText.includes("/")) {
+                // copy content of current time to previous time
+                this.table.rows[i].cells[3].innerText = this.table.rows[i].cells[1].innerText;
+                // clear current time and time comparisons
+                this.table.rows[i].cells[1].innerText = "/";
+                this.table.rows[i].cells[2].innerText = "/";
+            }
         }
     }
 
