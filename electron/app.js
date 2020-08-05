@@ -16,6 +16,7 @@ class Timer {
         this.append_button.disabled = true;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
+        this.reset_button.disabled = false;
         this.start_button.disabled = true;
         this.running = true;
 
@@ -200,17 +201,23 @@ class Timer {
     }
 
     reset() {
-        this.running = false;
-        this.current_row = 0;
-        this.amount_selected = 0;
-        this.delete_splits();
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
         this.delete_button.disabled = true;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
+        this.reset_button.disabled = true;
+        this.start_button.disabled = false;
+        this.append_button.disabled = false;
 
         this.user_input.value = "";
+        this.timer_time.innerText = "00:00:00.000";
+        this.delete_splits();
+
+        this.running = false;
+        this.start_time = null;
+        this.current_row = 0;
+        this.amount_selected = 0;
     }
     
     toggle_buttons() {
@@ -420,6 +427,7 @@ class Timer {
 
         this.reset_button = document.getElementById("reset-button");
         this.reset_button.onclick = this.reset.bind(this);
+        this.reset_button.disabled = true;
 
         this.split_elements = document.getElementsByClassName("split-buttons");
 
