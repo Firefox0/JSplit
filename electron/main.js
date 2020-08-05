@@ -9,7 +9,8 @@ const {readFileSync} = require("fs");
 // init window object
 let win;
 
-var load_split_t = null; 
+
+var loaded_split = null;
 // background image
 var image_path = null;
 
@@ -40,7 +41,7 @@ function create_window() {
     menu.append(new MenuItem({
         label: "Load Split",
         click: () => {
-            load_split_t = true;
+            loaded_split = load_split();
         }
     }));
 
@@ -130,29 +131,25 @@ app.on("window-all-closed", () => {
 
 // send context menu item state
 ipcMain.on("get-load-split", (event, arg) => {
-    if (load_split_t) {
-        const file_content = load_split();
-        event.sender.send("get-load-split-response", file_content);
-        load_split_t = null;
-    }
-    else {
-        event.sender.send("get-load-split-response", load_split_t);
+    if (loaded_split) {
+        event.sender.send("get-load-split-response", loaded_split);
+        loaded_split = null;
     }
 });
 
 // open dialog to save split
 ipcMain.on("get-save-split", (event, arg) => {
-    return event.sender.send("get-save-split-response", save_split(
+    event.sender.send("get-save-split-response", save_split(
             "It seems that you have beat your previous time. Save?"));
 })
 
 ipcMain.on("get-directory", (event, arg) => {
-    return event.sender.send("get-directory-response", pick_directory());
+    event.sender.send("get-directory-response", pick_directory());
 })
 
 ipcMain.on("get-image-path", (event, arg) => {
-    let temp = image_path;
-    image_path = null;
-    return event.sender.send("get-image-path-response", temp);
-
+    if (image_path) {
+        event.sender.send("get-image-path-response", image_path);
+        image_path = null;
+    }
 })
