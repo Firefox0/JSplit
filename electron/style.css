@@ -10,9 +10,6 @@ body {
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    /*
-    background: linear-gradient(rgb(47, 150, 163), rgb(48, 62, 143));
-    */
     font-family: sans-serif;
     color: white;
 }
@@ -36,24 +33,13 @@ body {
     text-align: center;
 }
 
-#start-button,
-#stop-button,
-#pause-button,
-#append-button,
-#split-button,
-#delete-button,
-#insert-above-button,
-#insert-below-button,
-#reset-button,
-#set-game-button {
-    width: 100;
-    /* make it clickable */
-    -webkit-app-region: no-drag;
+.timer-buttons * , 
+.split-buttons * {
+    width: 80;
+    height: 25;
 }
 
 #user-input {
     width: 307.5;
     height: 25;
-    /* make it clickable */
-    -webkit-app-region: no-drag;
 }
