@@ -62,14 +62,14 @@ class Timer {
             let milliseconds = time.get_milliseconds(difference);
 
             // display new time
-            this.timer_time.innerHTML = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+            this.timer_time.innerText = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
             
         }).bind(this));
     }
     
     split() {
         // save current split time
-        this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerText;
+        this.table.rows[this.current_row].cells[1].innerText = this.timer_time.innerText;
         // calculate time difference, but only if previous times exist
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
@@ -95,7 +95,7 @@ class Timer {
         
         this.running = false;
         this.start_time = null;
-        this.timer_time.innerHTML = "00:00:00.000";
+        this.timer_time.innerText = "00:00:00.000";
         this.current_row = 0;
     }
     
@@ -114,7 +114,7 @@ class Timer {
             let row = this.table.insertRow(row_index);
             row.onclick = (() => this.select_row(row)).bind(this);
             let split_name = row.insertCell(0);
-            split_name.innerHTML = content;
+            split_name.innerText = content;
             // placeholder for split time
             row.insertCell(1).innerText = "/";
             // placeholder for comparison
@@ -130,7 +130,7 @@ class Timer {
     }
     
     set_game() {
-        this.current_game.innerHTML = this.user_input.value; 
+        this.current_game.innerText = this.user_input.value; 
         this.user_input.value = "";
         this.user_input.focus();
     }
@@ -317,8 +317,8 @@ class Timer {
             if (this.table.rows.length > 0) {
                 var split_names = [], split_times = [];
                 for (let i = 0; i < this.table.rows.length; i++) {                    
-                    split_names[i] = this.table.rows[i].cells[0].innerHTML;
-                    split_times[i] = this.table.rows[i].cells[1].innerHTML;
+                    split_names[i] = this.table.rows[i].cells[0].innerText;
+                    split_times[i] = this.table.rows[i].cells[1].innerText;
                 }
                 let dict = {};
                 dict["game_name"] = this.current_game.innerText;
@@ -341,12 +341,12 @@ class Timer {
             for (let i = 0; i < splits["split_names"].length; i++) {
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
-                row.insertCell(0).innerHTML = splits["split_names"][i];
+                row.insertCell(0).innerText = splits["split_names"][i];
                 // placeholder for future split times
-                row.insertCell(1).innerHTML = "/";
+                row.insertCell(1).innerText = "/";
                 // placeholder for comparison
-                row.insertCell(2).innerHTML = "/";
-                row.insertCell(3).innerHTML = splits["split_times"][i];
+                row.insertCell(2).innerText = "/";
+                row.insertCell(3).innerText = splits["split_times"][i];
             }
             this.set_transparent_background();
         }
