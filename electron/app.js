@@ -73,17 +73,17 @@ class Timer {
         // calculate time difference, but only if previous times exist
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
-            let diff_cell = this.table.rows[this.current_row].cells[2];
-            diff_cell.innerText = time.time_difference(this.table.rows[this.current_row].cells[1].innerText, 
-                previous_time);
-                diff_cell.style.color = diff_cell.innerText.includes("+") ? "red" : "green";
+            let comparison = this.table.rows[this.current_row].cells[2];
+            comparison.innerText = time.time_difference(
+                this.table.rows[this.current_row].cells[1].innerText, previous_time);
+            comparison.style.color = comparison.innerText.includes("+") ? "red" : "green";
         }
             
         this.current_row++;
         // pause when all splits are done
         if (this.current_row == this.table.rows.length) {
-            this.current_row = 0;
             this.split_button.disabled = true;
+            this.current_row = 0;
             this.pause_timer();
         }
     }
