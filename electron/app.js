@@ -36,7 +36,7 @@ class Timer {
             this.start_time += new Date().getTime() - this.pause_time;
             this.pause_time = null;
         }
-
+        
         let interval_id = setInterval((() => {
             // if stop button was pressed
             if (!this.running) {
@@ -110,26 +110,7 @@ class Timer {
             this.delete_button.disabled = true;
         }
     }
-    
-    time_to_ms(time) {
-        // for format 00:00:00.000
-        
-        var new_parsed_times = [];
-        // get hours and minutes
-        let first_parse = time.split(":");
-        for (let i = 0; i < 2; i++) {
-            new_parsed_times[i] = parseInt(first_parse[i]);
-        }
-        // get seconds and milliseconds
-        let second_parse = first_parse[2].split(".");
-        new_parsed_times[2] = parseInt(second_parse[0]);
-        new_parsed_times[3] = parseInt(second_parse[1]);
-        // total time in ms
-        return new_parsed_times[0] * 3600000 + new_parsed_times[1] * 60000 
-        + new_parsed_times[2] * 1000 + new_parsed_times[3];
-        
-    }
-    
+
     split() {
         // save current split time
         this.table.rows[this.current_row].cells[1].innerHTML = this.timer_time.innerText;
@@ -145,6 +126,7 @@ class Timer {
         this.current_row++;
         // pause when all splits are done
         if (this.current_row == this.table.rows.length) {
+            this.current_row = 0;
             this.split_button.disabled = true;
             this.pause_timer();
         }
@@ -301,13 +283,24 @@ class Timer {
         }
     }
 
+    change_background(image_path) {
+        if (image_path) {
+            let background = document.getElementById("background-image");
+            background.background = image_path;
+        }
+    }
+
     start_ipc() {
         // request context menu item state
         setInterval(() => ipc_send("get-load-split", ""), 10);
+        // check if image path was chosen 
+        setInterval(() => ipc_send("get-image-path", ""), 10);
+
         // listen on specific message identifies
         ipc_receive("get-load-split-response", this.load_split.bind(this));
         ipc_receive("get-save-split-response", this.save_split.bind(this));
         ipc_receive("get-directory-response", this.pick_directory.bind(this));
+        ipc_receive("get-image-path-response", this.change_background.bind(this));
     }
     
     request_save_split() {
