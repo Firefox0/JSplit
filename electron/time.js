@@ -42,15 +42,35 @@ export function insert_zeros(num, length = 2) {
     return num;
 }
 
+export function time_to_ms(time) {
+    // for format 00:00:00.000
+    
+    var new_parsed_times = [];
+    // get hours and minutes
+    let first_parse = time.split(":");
+    for (let i = 0; i < 2; i++) {
+        new_parsed_times[i] = parseInt(first_parse[i]);
+    }
+    // get seconds and milliseconds
+    let second_parse = first_parse[2].split(".");
+    new_parsed_times[2] = parseInt(second_parse[0]);
+    new_parsed_times[3] = parseInt(second_parse[1]);
+    // total time in ms
+    return new_parsed_times[0] * 3600000 + new_parsed_times[1] * 60000 
+    + new_parsed_times[2] * 1000 + new_parsed_times[3];
+    
+}
+
 export function ms_to_time(ms) {
     let h = Math.floor(ms/1000/60/60);
     let m = Math.floor((ms/1000/60/60 - h)*60);
     let s = Math.floor(((ms/1000/60/60 - h)*60 - m)*60);
     let ms_ = ms % 1000;
-    
-    h = h < 10 ? "0" + h : h;
-    m = m < 10 ? "0" + m : m;
-    s = s < 10 ? "0" + s : s;
+
+    h = insert_zeros(h, 2);
+    m = insert_zeros(m, 2);
+    s = insert_zeros(s, 2);
+    ms_ = insert_zeros(ms_, 3);
     
     return h + ":" + m + ":" + s + "." + ms_;
 }
@@ -70,11 +90,12 @@ export function remove_time_bloat(time) {
 }
 
 export function time_difference(time1, time2) {
-    
+    console.log("[Normal] first time: " + time1 + " second time: " + time2);
     // convert times to ms
     let time1_ms = time_to_ms(time1);
     let time2_ms = time_to_ms(time2);
-    
+    console.log("[MS] first time: " + time1_ms + " second time: " + time2_ms);
+
     var sign = "-";
     var final_time_ms = null;
     if (time1_ms < time2_ms) {
@@ -86,8 +107,7 @@ export function time_difference(time1, time2) {
         sign = "+";
         final_time_ms = time1_ms - time2_ms;
     }
-    
-    let time_diff = ms_to_time(time1_ms - time2_ms);
-    let clear_time = remove_time_bloat(time_diff); 
+    let time_diff = ms_to_time(final_time_ms);
+    let clear_time = remove_time_bloat(time_diff);
     return sign + clear_time;
 }
