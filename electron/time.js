@@ -43,18 +43,39 @@ export function insert_zeros(num, length = 2) {
 }
 
 export function time_to_ms(time) {
-    // for format 00:00:00.000
-    
-    var new_parsed_times = [];
-    // get hours and minutes
+
+    let new_parsed_times = [];
     let first_parse = time.split(":");
-    for (let i = 0; i < 2; i++) {
-        new_parsed_times[i] = parseInt(first_parse[i]);
+
+    // if at least minutes is existent
+    if (first_parse.length > 1) {
+        // if hours and minutes exist
+        if (first_parse.length == 3) {
+            new_parsed_times[0] = parseInt(first_parse[0]);
+            new_parsed_times[1] = parseInt(first_parse[1]);
+        }
+        else {
+            // if hours dont exist, minutes do though
+            new_parsed_times[0] = 0;
+            new_parsed_times[1] = parseInt(first_parse[0]);
+        }
+        // get seconds and ms
+        // -1 to get last part (doesnt matter if hours doesnt exist)
+        let second_parse = first_parse[first_parse.length - 1].split(".")
+        new_parsed_times[2] = parseInt(second_parse[0]);
+        new_parsed_times[3] = parseInt(second_parse[1]);
     }
-    // get seconds and milliseconds
-    let second_parse = first_parse[2].split(".");
-    new_parsed_times[2] = parseInt(second_parse[0]);
-    new_parsed_times[3] = parseInt(second_parse[1]);
+    else {
+        // hours and minutes are non existent, so 0
+        new_parsed_times[0] = 0;
+        new_parsed_times[1] = 0;
+        
+        // only seconds and ms exist, so split from original var
+        let second_parse = time.split(".");
+        new_parsed_times[2] = parseInt(second_parse[0]);
+        new_parsed_times[3] = parseInt(second_parse[1]);
+    }
+
     // total time in ms
     return new_parsed_times[0] * 3600000 + new_parsed_times[1] * 60000 
     + new_parsed_times[2] * 1000 + new_parsed_times[3];
@@ -79,13 +100,30 @@ export function remove_time_bloat(time) {
     let parsed = time.split(":");
     let h = parsed[0];
     let m = parsed[1];
-    var final_time = parsed[2];
-    if (m !== "00") {
-        final_time = m + ":" + final_time;
-        if (h !== "00") {
-            final_time = h + ":" + final_time;
+    let s_ms = parsed[2];
+    let final_time = "";
+
+    if (h != "00") {
+        f_time = h < 10 ? h.substring(1) : h;
+        final_time += ":";
+    }
+
+    if (final_time) {
+        final_time += m + ":";
+    }
+    else {
+        if (m != "00") {
+            final_time = (m < 10 ? m.substring(1) : m) + ":";
         }
     }
+
+    if (final_time) {
+        final_time += s_ms;
+    }
+    else {
+        final_time = s_ms < 10 ? s_ms.substring(1) : s_ms;
+    }
+
     return final_time;
 }
 
