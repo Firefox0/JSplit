@@ -130,18 +130,18 @@ ipcMain.on("get-load-split", (event, arg) => {
 ipcMain.on("get-save-split", (event, arg) => {
     event.sender.send("get-save-split-response", save_split(
         "It seems that you have beat your previous time. Save?"));
-    })
+});
     
 ipcMain.on("get-directory", (event, arg) => {
     event.sender.send("get-directory-response", pick_directory());
-})
+});
 
 ipcMain.on("get-image-path", (event, arg) => {
     if (image_path) {
         event.sender.send("get-image-path-response", image_path);
         image_path = null;
     }
-})
+});
 
 // run create window function
 app.on("ready", () => create_window())
@@ -152,4 +152,4 @@ app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
         app.quit();
     }
-})
+});
