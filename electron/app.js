@@ -70,15 +70,11 @@ class Timer {
         this.start_button.disabled = false;
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
+
         this.running = false;
         this.start_time = null;
         this.timer_time.innerHTML = "00:00:00.000";
-        // clear current times
-        for (let i = 0; i < this.table.rows.length; i++) {
-            this.table.rows[i].cells[1].innerText = "/";
-            this.table.rows[i].cells[2].innerText = "/";
-            this.table.rows[i].cells[2].style.color = "";
-        }
+        this.current_row = 0;
     }
 
     pause_timer() {
@@ -275,6 +271,15 @@ class Timer {
         this.user_input.focus();
     }
 
+    clear_run() {
+        // clear current times
+        for (let i = 0; i < this.table.rows.length; i++) {
+            this.table.rows[i].cells[1].innerText = "/";
+            this.table.rows[i].cells[2].innerText = "/";
+            this.table.rows[i].cells[2].style.color = "";
+        }
+    }
+
     delete_splits() {
         while (this.table.rows.length) {
             this.table.deleteRow(0);
@@ -338,6 +343,9 @@ class Timer {
             // request to choose directory
             this.request_pick_directory();
         }
+        else {
+            this.clear_run();
+        }
     }
 
     pick_directory(directory) {
@@ -356,8 +364,9 @@ class Timer {
                 dict["split_names"] = split_names;
                 dict["split_times"] = split_times;
                 write_file(directory, JSON.stringify(dict), "utf-8");
-                this.current_times_to_previous();
             }
+            this.current_times_to_previous();
+            this.clear_run();
         }
     }
 
