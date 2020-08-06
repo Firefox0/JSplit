@@ -23,8 +23,6 @@ body {
     width: 310;
     /* prevent highlighting for smoother user experience while selecting rows */
     user-select: none;
-    /* make table more visible by adding a black transparent background" */
-    background: transparent;
     /* auto width (for background) */
     width: auto;
 }

@@ -420,6 +420,8 @@ class Timer {
         this.pause_button.disabled = true;
 
         this.table = document.getElementById("table");
+        this.table.style.background = "transparent";
+
         this.user_input = document.getElementById("user-input");
 
         this.append_button = document.getElementById("append-button");
