@@ -120,7 +120,7 @@ class Timer {
             let split_name = row.insertCell(0);
             split_name.innerText = content;
             // create cells for current time, comparison and previous time
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 let new_row = row.insertCell(i);
                 new_row.style.textAlign = "right"
                 new_row.innerText = "/";
@@ -230,7 +230,9 @@ class Timer {
             // only move valid times
             if (!this.table.rows[i].cells[1].innerText.includes("/")) {
                 // copy content of current time to previous time
-                this.table.rows[i].cells[3].innerText = this.table.rows[i].cells[1].innerText;
+                let current_time = this.table.rows[i].cells[1].innerText;
+                this.table.rows[i].cells[3].innerText = current_time;
+                this.table.rows[i].cells[4].innerText = current_time;
                 // clear current time and time comparisons
                 this.table.rows[i].cells[1].innerText = "/";
                 this.table.rows[i].cells[2].innerText = "/";
@@ -319,15 +321,17 @@ class Timer {
             this.append_button.disabled = false;
             // save times
             if (this.table.rows.length > 0) {
-                var split_names = [], split_times = [];
+                var split_names = [], split_times = [], best_segments = [];
                 for (let i = 0; i < this.table.rows.length; i++) {                    
                     split_names[i] = this.table.rows[i].cells[0].innerText;
                     split_times[i] = this.table.rows[i].cells[1].innerText;
+                    best_segments[i] = this.table.rows[i].cells[4].innerText;
                 }
                 let dict = {};
                 dict["game_name"] = this.current_game.innerText;
                 dict["split_names"] = split_names;
                 dict["split_times"] = split_times;
+                dict["best_segments"] = best_segments;
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.move_current_times();
@@ -345,19 +349,16 @@ class Timer {
             for (let i = 0; i < splits["split_names"].length; i++) {
                 let row = this.table.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
+                // split_name | current_time | comparison | previous_time | best_segment
                 row.insertCell(0).innerText = splits["split_names"][i];
-
-                let current_time_cell = row.insertCell(1);
-                current_time_cell.style.textAlign = "right";
-                current_time_cell.innerText = "/";
-
-                let comparison_cell = row.insertCell(2);
-                comparison_cell.style.textAlign = "right";
-                comparison_cell.innerText = "/";
-                
-                let previous_time_cell = row.insertCell(3);
-                previous_time_cell.style.textAlign = "right";
-                previous_time_cell.innerText = splits["split_times"][i];
+                row.insertCell(1).innerText = "/";
+                row.insertCell(2).innerText = "/";                
+                row.insertCell(3).innerText = splits["split_times"][i];
+                row.insertCell(4).innerText = splits["best_segments"][i];
+                // align everything except split name to the right
+                for (let i = 1; i < row.length; i++) {
+                    row.cells[i].style.textAlign = "right";
+                }
             }
             this.set_transparent_background();
         }
