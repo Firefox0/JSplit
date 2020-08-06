@@ -270,17 +270,18 @@ class Timer {
     }
     
     toggle_buttons() {
-        let visible = this.split_elements[0].style.visibility == "hidden" ? false : true;
+        // toggle user_input 
+        this.toggle_element(this.user_input);
         for (let i = 0; i < this.split_elements.length; i++) {
-            if (visible) {
-                this.split_elements[i].style.visibility = "hidden";
-            }
-            else {
-                this.split_elements[i].removeAttribute("style");
-            }
+            this.toggle_element(this.split_elements[i]);
         }
     }
     
+    toggle_element(element) {
+        element.style.visibility == "hidden" ? element.removeAttribute("style") : 
+                                                element.style.visibility = "hidden";
+    }
+
     start_ipc() {
         // request context menu item state
         setInterval(() => ipc_send("get-load-split", ""), 10);
