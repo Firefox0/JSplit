@@ -365,7 +365,7 @@ class Timer {
         if (directory) {
             this.append_button.disabled = false;
             // save times
-            if (this.splits.rows.length) {
+            if (this.splits_exist()) {
                 let split_names = [];
                 let split_times = []; 
                 let best_segments = [];
@@ -439,7 +439,6 @@ class Timer {
     
     key_listener() {
             document.addEventListener("keydown", event => {
-            // so you can add listened keys to split names without starting the timer
             const key = event.key;
             if (key === "Enter") {
                 this.add_split();
@@ -448,12 +447,7 @@ class Timer {
                 switch (key) {
                     case ("1"): 
                         if (this.running) {
-                            if (this.splits.rows.length > 0) {
-                                this.split();
-                            }
-                            else {
-                                this.pause_timer();
-                            }
+                            this.splits_exist() ?  this.split() : this.pause_timer();
                         }
                         else {
                             this.start_timer();
