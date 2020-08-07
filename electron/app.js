@@ -100,14 +100,11 @@ class Timer {
         current_time_cell.innerText = current_time; 
 
         // calculate time difference, but only if previous times exist
-        let previous_time = this.splits.rows[this.current_row].cells[PB_TIME].innerText;
-        if (previous_time !== "/") {
-            let best_segment = this.splits.rows[this.current_row].cells[BS_TIME];
-            let previous_time = this.splits.rows[this.current_row].cells[PB_TIME];
-
-            let best_segment_diff = time.time_difference(current_time, best_segment.innerText);
+        let previous_time = this.splits.rows[this.current_row].cells[PB_TIME];
+        if (previous_time.innerText !== "/") {
             let previous_time_diff = time.time_difference(current_time, previous_time.innerText);
-
+            let best_segment = this.splits.rows[this.current_row].cells[BS_TIME];
+            let best_segment_diff = time.time_difference(current_time, best_segment.innerText);
             let comparison_cell = this.splits.rows[this.current_row].cells[COMPARISON];
             // check if faster than best segment
             if (best_segment_diff.includes("-")) {
@@ -414,6 +411,7 @@ class Timer {
             this.delete_splits();
             let splits = JSON.parse(splits_json);
             this.current_game.innerText = splits["game_name"];
+            this.current_game.style.visibility = "";
             for (let i = 0; i < splits["split_names"].length; i++) {
                 let row = this.splits.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
