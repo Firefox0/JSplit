@@ -1,5 +1,12 @@
 import * as time from "./time.js";
 
+const SPLIT_NAME = 0;
+const SPLIT_TIME = 1;
+const COMPARISON = 2;
+const PB_TIME = 3;
+const BS_TIME = 4;
+const GOLD = "rgb(255, 215, 0)";
+
 class Timer {
 
     // timer running
@@ -8,6 +15,23 @@ class Timer {
     current_row = 0;
     // splits selected
     amount_selected = 0;
+    
+    splits_exist() {
+        // true if at least one split exists
+        // false otherwise
+        return this.splits.rows.length > 0;
+    }
+
+    run_completed() {
+        // true if run is completed
+        // false otherwise
+        if (this.splits_exist()) {
+            if (this.current_row === this.splits.rows.length) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     start_timer() {
 
@@ -20,16 +44,13 @@ class Timer {
         this.start_button.disabled = true;
         this.running = true;
 
-        // reset style colors in case rows are still select
-        // (prevent issue where insert buttons only enable/disable when selection is done, 
-        // but not when paused/stopped even though this would be valid)
-        if (this.table.rows.length > 0) {
-            for (let i = 0; i < this.table.rows.length; i++) {
-                this.table.rows[i].style.color = "";
+        // reset style colors in case rows are still selected
+        if (this.splits_exist()) {
+            for (let i = 0; i < this.splits.rows.length; i++) {
+                this.splits.rows[i].style.color = "";
             }
         }
 
-        // if start time null then initialize (from stop)
         if (!this.start_time) {
             this.start_time = new Date().getTime();
         }
@@ -39,20 +60,17 @@ class Timer {
         }
         
         let interval_id = setInterval((() => {
-            // if stop button was pressed
             if (!this.running) {
-                // if splits exist
-                if (this.table.rows.length > 0) {                    
-                    // also request if there is any gold
-                    let gold = 0;
-                    for (let i = 0; i < this.table.rows.length; i++) {
-                        if (this.table.rows[i].cells[2].style.color == "rgb(255, 215, 0)") {
-                            gold = 1;
+                if (this.splits.rows.length > 0) {  
+                    let gold_exists = 0;
+                    for (let i = 0; i < this.splits.rows.length; i++) {
+                        let current_comparison_color = this.splits.rows[i].cells[COMPARISON].style.color;
+                        if (current_comparison_color == GOLD) {
+                            gold_exists = 1;
                             break;
                         }
                     }
-                    // save as long as no time loss (time save or no previous time)
-                    if (gold || !this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
+                    if (gold_exists || !this.splits.rows[this.splits.rows.length - 1].cells[COMPARISON].innerText.includes("+")) {
                         this.request_save_split();
                     }
                 }
@@ -78,25 +96,25 @@ class Timer {
     split() {
         // save current split time
         let current_time = time.remove_time_bloat(this.timer_time.innerText);
-        let current_time_cell = this.table.rows[this.current_row].cells[1];
+        let current_time_cell = this.splits.rows[this.current_row].cells[SPLIT_TIME];
         current_time_cell.innerText = current_time; 
 
         // calculate time difference, but only if previous times exist
-        let previous_time = this.table.rows[this.current_row].cells[3].innerText;
+        let previous_time = this.splits.rows[this.current_row].cells[PB_TIME].innerText;
         if (previous_time !== "/") {
             console.log("in here");
-            let best_segment = this.table.rows[this.current_row].cells[4];
-            let best_segment_diff = time.time_difference(current_time, best_segment.innerText);
+            let best_segment = this.splits.rows[this.current_row].cells[BS_TIME];
+            let previous_time = this.splits.rows[this.current_row].cells[PB_TIME];
 
-            let previous_time = this.table.rows[this.current_row].cells[3];
+            let best_segment_diff = time.time_difference(current_time, best_segment.innerText);
             let previous_time_diff = time.time_difference(current_time, previous_time.innerText);
 
-            let comparison_cell = this.table.rows[this.current_row].cells[2];
+            let comparison_cell = this.splits.rows[this.current_row].cells[COMPARISON];
             // check if faster than best segment
             if (best_segment_diff.includes("-")) {
                 comparison_cell.innerText = best_segment_diff;
                 // golden color
-                comparison_cell.style.color = "rgb(255, 215, 0)";
+                comparison_cell.style.color = GOLD;
             }
             else {
                 comparison_cell.innerText = previous_time_diff;
@@ -106,7 +124,7 @@ class Timer {
             
         this.current_row++;
         // pause when all splits are done
-        if (this.current_row == this.table.rows.length) {
+        if (this.run_completed()) {
             this.split_button.disabled = true;
             this.pause_timer();
         }
@@ -137,9 +155,9 @@ class Timer {
         let content = this.user_input.value;
         if (content) {
             // add row and keep count of splits
-            let row = this.table.insertRow(row_index);
+            let row = this.splits.insertRow(row_index);
             row.onclick = (() => this.select_row(row)).bind(this);
-            let split_name = row.insertCell(0);
+            let split_name = row.insertCell(SPLIT_NAME);
             split_name.innerText = content;
             // create cells for current time, comparison and previous time
             for (let i = 1; i <= 4; i++) {
@@ -182,23 +200,23 @@ class Timer {
     }
     
     delete_split() {
-        for (let i = 0; i < this.table.rows.length; i++) {
-            if (this.table.rows[i].style.color == "black") {
-                this.table.deleteRow(i);
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            if (this.splits.rows[i].style.color == "black") {
+                this.splits.deleteRow(i);
                 // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
                 i--;
             }
         }
         this.delete_button.disabled = true;
         // set transparent background when no splits were created (prevent black spot)
-        if (this.table.rows.length == 0) {
-            this.table.style.background = "transparent";
+        if (!this.splits_exist()) {
+            this.splits.style.background = "transparent";
         }
     }
     
     insert_above() {
-        for (let i = 0; i < this.table.rows.length; i++) {
-            if (this.table.rows[i].style.color == "black") {
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            if (this.splits.rows[i].style.color == "black") {
             this.add_split(i);
             return;
             }
@@ -206,8 +224,8 @@ class Timer {
     }
     
     insert_below() {
-        for (let i = 0; i < this.table.rows.length; i++) {
-            if (this.table.rows[i].style.color == "black") {
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            if (this.splits.rows[i].style.color == "black") {
                 this.add_split(i + 1);
                 return;
             }
@@ -222,61 +240,58 @@ class Timer {
     
     set_transparent_background() {
         // set background when there is atleast one split (prevent black spot)
-        if (this.table.rows.length > 0) {
-            if (this.table.style.background == "transparent") {
-                this.table.style.background = "rgba(0, 0, 0, 0.25)";
+        if (this.splits.rows.length > 0) {
+            if (this.splits.style.background == "transparent") {
+                this.splits.style.background = "rgba(0, 0, 0, 0.25)";
             }
         }
     }
 
     clear_run() {
         // clear current times
-        for (let i = 0; i < this.table.rows.length; i++) {
-            this.table.rows[i].cells[1].innerText = "/";
-            this.table.rows[i].cells[2].innerText = "/";
-            this.table.rows[i].cells[2].style.color = "";
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            this.splits.rows[i].cells[SPLIT_TIME].innerText = "/";
+            this.splits.rows[i].cells[COMPARISON].innerText = "/";
+            this.splits.rows[i].cells[COMPARISON].style.color = "";
         }
     }
     
     delete_splits() {
-        while (this.table.rows.length) {
-            this.table.deleteRow(0);
+        while (this.splits.rows.length) {
+            this.splits.deleteRow(0);
         }
         // prevent black spot
-        this.table.style.background = "transparent";
+        this.splits.style.background = "transparent";
     }
     
     move_current_times() {
-        // if run was completed
-        console.log("cr: " + this.current_row + " trl: " + this.table.rows.length);
-        if (this.current_row === this.table.rows.length) {
-            console.log("")
+        if (this.run_completed()) {
             // move the current times to the previous times
-            for (let i = 0; i < this.table.rows.length; i++) {
+            for (let i = 0; i < this.splits.rows.length; i++) {
                 // only move valid times
-                if (!this.table.rows[i].cells[1].innerText.includes("/")) {
+                if (!this.splits.rows[i].cells[SPLIT_TIME].innerText.includes("/")) {
                     // copy content of current time to previous time
-                    let current_time = this.table.rows[i].cells[1].innerText;
-                    let comparison_cell = this.table.rows[i].cells[2];
-                    let best_segment_cell = this.table.rows[i].cells[4];
+                    let current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
+                    let comparison_cell = this.splits.rows[i].cells[COMPARISON];
+                    let best_segment_cell = this.splits.rows[i].cells[BS_TIME];
                     // only change best segment if its a gold or empty
-                    if (comparison_cell.style.color == "rgb(255, 215, 0)" || best_segment_cell.innerText == "/") {
+                    if (comparison_cell.style.color == GOLD || best_segment_cell.innerText == "/") {
                         best_segment_cell.innerText = current_time;
                     }
-                    this.table.rows[i].cells[3].innerText = current_time;
+                    this.splits.rows[i].cells[PB_TIME].innerText = current_time;
                     // clear current time and time comparisons
-                    this.table.rows[i].cells[1].innerText = "/";
-                    this.table.rows[i].cells[2].innerText = "/";
+                    this.splits.rows[i].cells[SPLIT_TIME].innerText = "/";
+                    this.splits.rows[i].cells[COMPARISON].innerText = "/";
                 }
             }
         }
         else {
             // if run was not completed, then only move golds
-            for (let i = 0; i < this.table.rows.length; i++) {
-                let comparison_cell = this.table.rows[i].cells[2];
-                let best_segment_cell = this.table.rows[i].cells[4];
-                if (comparison_cell.style.color == "rgb(255, 215, 0)" || best_segment_cell.innerText == "/") {
-                    best_segment_cell.innerText = this.table.rows[i].cells[1].innerText;
+            for (let i = 0; i < this.splits.rows.length; i++) {
+                let comparison_cell = this.splits.rows[i].cells[COMPARISON];
+                let best_segment_cell = this.splits.rows[i].cells[BS_TIME];
+                if (comparison_cell.style.color == GOLD || best_segment_cell.innerText == "/") {
+                    best_segment_cell.innerText = this.splits.rows[i].cells[SPLIT_TIME].innerText;
                 }
             }
         }
@@ -311,31 +326,18 @@ class Timer {
         }
     }
     
+    toggle_element(element) {
+        element.style.visibility == "hidden" ? element.removeAttribute("style") : 
+                                                element.style.visibility = "hidden";
+    }
+
     toggle_buttons() {
-        // toggle user_input 
         this.toggle_element(this.user_input);
         for (let i = 0; i < this.split_elements.length; i++) {
             this.toggle_element(this.split_elements[i]);
         }
     }
     
-    toggle_element(element) {
-        element.style.visibility == "hidden" ? element.removeAttribute("style") : 
-                                                element.style.visibility = "hidden";
-    }
-
-    start_ipc() {
-        // request context menu item state
-        setInterval(() => ipc_send("get-load-split", ""), 10);
-        // check if image path was chosen 
-        setInterval(() => ipc_send("get-image-path", ""), 10);
-        
-        // listen on specific message identifies
-        ipc_receive("get-load-split-response", this.load_split.bind(this));
-        ipc_receive("get-save-split-response", this.save_split.bind(this));
-        ipc_receive("get-directory-response", this.pick_directory.bind(this));
-        ipc_receive("get-image-path-response", this.change_background.bind(this));
-    }
     
     request_save_split() {
         // request to show dialog
@@ -363,38 +365,32 @@ class Timer {
         if (directory) {
             this.append_button.disabled = false;
             // save times
-            if (this.table.rows.length) {
+            if (this.splits.rows.length) {
                 let split_names = [];
                 let split_times = []; 
                 let best_segments = [];
-
+                
                 let current_time = null;
                 let comparison = null;
                 let best_segment = null; 
+                
+                for (let i = 0; i < this.splits.rows.length; i++) {                    
+                    split_names[i] = this.splits.rows[i].cells[SPLIT_NAME].innerText;
+                    current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
 
-                for (let i = 0; i < this.table.rows.length; i++) {                    
-                    split_names[i] = this.table.rows[i].cells[0].innerText;
-                    current_time = this.table.rows[i].cells[1].innerText;
-                    comparison = this.table.rows[i].cells[2];
-                    // check if run was completely done
                     // only overwrite split_times when run was completed
-                    // current row is the same as rows length when done splitting
-                    if (this.current_row === this.table.rows.length) {
+                    if (this.run_completed()) {
                         split_times[i] = current_time;
                     }
                     else {
-                        // try to take previous time if there is no current time
-                        // will be / if there is no previous time either
-                        split_times[i] = current_time == "/" ? this.table.rows[i].cells[3].innerText : current_time;
+                        split_times[i] = current_time == "/" ? this.splits.rows[i].cells[PB_TIME].innerText : current_time;
                     }
-
-                    best_segment = this.table.rows[i].cells[4].innerText;
-                    // save best segment
-                    // if there is none set already
-                    // if its a gold - does not matter if run was finished or not
-                    best_segments[i] = comparison.style.color == "rgb(255, 215, 0)" ? best_segment : split_times[i];
+                    
+                    comparison = this.splits.rows[i].cells[COMPARISON];
+                    best_segment = this.splits.rows[i].cells[BS_TIME].innerText;
+                    best_segments[i] = comparison.style.color == GOLD ? best_segment : split_times[i];
                 }
-
+                
                 let dict = {};
                 dict["game_name"] = this.current_game.innerText;
                 dict["split_names"] = split_names;
@@ -403,7 +399,6 @@ class Timer {
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.move_current_times();
-            // clear run after saving
             this.stop_timer();
         }
     }
@@ -415,15 +410,15 @@ class Timer {
             let splits = JSON.parse(splits_json);
             this.current_game.innerText = splits["game_name"];
             for (let i = 0; i < splits["split_names"].length; i++) {
-                let row = this.table.insertRow(-1);
+                let row = this.splits.insertRow(-1);
                 row.onclick = (() => this.select_row(row)).bind(this);
-                // split_name | current_time | comparison | previous_time | best_segment
-                row.insertCell(0).innerText = splits["split_names"][i];
-                row.insertCell(1).innerText = "/";
-                row.insertCell(2).innerText = "/";                
-                row.insertCell(3).innerText = splits["split_times"][i];
-                row.insertCell(4).innerText = splits["best_segments"][i];
-                // align everything except split name to the right
+
+                row.insertCell(SPLIT_NAME).innerText = splits["split_names"][i];
+                row.insertCell(SPLIT_TIME).innerText = "/";
+                row.insertCell(COMPARISON).innerText = "/";                
+                row.insertCell(PB_TIME).innerText = splits["split_times"][i];
+                row.insertCell(BS_TIME).innerText = splits["best_segments"][i];
+
                 for (let i = 1; i < row.length; i++) {
                     row.cells[i].style.textAlign = "right";
                 }
@@ -431,11 +426,19 @@ class Timer {
             this.set_transparent_background();
         }
     }
+
+    start_ipc() {
+        setInterval(() => ipc_send("get-load-split", ""), 10);
+        setInterval(() => ipc_send("get-image-path", ""), 10);
+        
+        ipc_receive("get-load-split-response", this.load_split.bind(this));
+        ipc_receive("get-save-split-response", this.save_split.bind(this));
+        ipc_receive("get-directory-response", this.pick_directory.bind(this));
+        ipc_receive("get-image-path-response", this.change_background.bind(this));
+    }
     
     key_listener() {
-
-        // key listener
-        document.addEventListener("keydown", event => {
+            document.addEventListener("keydown", event => {
             // so you can add listened keys to split names without starting the timer
             const key = event.key;
             if (key === "Enter") {
@@ -445,7 +448,7 @@ class Timer {
                 switch (key) {
                     case ("1"): 
                         if (this.running) {
-                            if (this.table.rows.length > 0) {
+                            if (this.splits.rows.length > 0) {
                                 this.split();
                             }
                             else {
@@ -471,12 +474,11 @@ class Timer {
             }
         });
     }
-    
+
     main() {
         this.timer_time = document.getElementById("time");
+
         this.start_button = document.getElementById("start-button");
-        // function(){} so js doesnt call the function, also bind it to class so it can 
-        // access class attributes
         this.start_button.onclick = this.start_timer.bind(this);
 
         this.stop_button = document.getElementById("stop-button");
@@ -487,8 +489,8 @@ class Timer {
         this.pause_button.onclick = this.pause_timer.bind(this);
         this.pause_button.disabled = true;
 
-        this.table = document.getElementById("table");
-        this.table.style.background = "transparent";
+        this.splits = document.getElementById("table");
+        this.splits.style.background = "transparent";
 
         this.user_input = document.getElementById("user-input");
 
@@ -523,10 +525,7 @@ class Timer {
 
         this.background = document.getElementById("background-image");
 
-        // start inter process communication (receiving)
         this.start_ipc();
-
-        // start listening to keys after everything was loaded
         this.key_listener();
     }
 }
