@@ -6,11 +6,9 @@ const path = require("path");
 const url = require("url");
 const {readFileSync} = require("fs");
 
-// init window object
 let win;
-var loaded_split = null;
-// background image
-var image_path = null;
+let loaded_split = null;
+let image_path = null;
 let json_filter = [{name: "json", extensions: ["json"]}];
 
 function create_window() {
@@ -93,13 +91,7 @@ function pick_directory(message) {
         filters: json_filter,
         properties: ["promptToCreate"]
     })
-    if (!files) {
-        return;
-    }
-    else {
-        // array, return first file
-        return files[0];
-    }
+    return files ? files[0] : null;
 } 
 
 function pick_image(message) {
@@ -109,13 +101,7 @@ function pick_image(message) {
         }],
         properties: ["promptToCreate"]
     })
-    if (!files) {
-        return;
-    }
-    else {
-        // array, return first file
-        return files[0];
-    }
+    return files ? files[0] : null;
 }
 
 // send context menu item state
