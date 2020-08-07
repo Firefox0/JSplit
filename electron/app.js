@@ -42,18 +42,17 @@ class Timer {
             // if stop button was pressed
             if (!this.running) {
                 // if splits exist
-                if (this.table.rows.length > 0) {
-                    // save as long as no time loss (time save or no previous time)
-
+                if (this.table.rows.length > 0) {                    
                     // also request if there is any gold
                     let gold = 0;
-                    for (let i = 0; this.table.rows.length; i++) {
+                    for (let i = 0; i < this.table.rows.length; i++) {
                         if (this.table.rows[i].cells[2].style.color == "rgb(255, 215, 0)") {
                             gold = 1;
                             break;
                         }
                     }
-                    if (!this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
+                    // save as long as no time loss (time save or no previous time)
+                    if (gold || !this.table.rows[this.table.rows.length - 1].cells[2].innerText.includes("+")) {
                         this.request_save_split();
                     }
                 }
@@ -79,13 +78,13 @@ class Timer {
     split() {
         // save current split time
         let current_time = time.remove_time_bloat(this.timer_time.innerText);
-        console.log(current_time);
         let current_time_cell = this.table.rows[this.current_row].cells[1];
         current_time_cell.innerText = current_time; 
 
         // calculate time difference, but only if previous times exist
         let previous_time = this.table.rows[this.current_row].cells[3].innerText;
         if (previous_time !== "/") {
+            console.log("in here");
             let best_segment = this.table.rows[this.current_row].cells[4];
             let best_segment_diff = time.time_difference(current_time, best_segment.innerText);
 
@@ -95,13 +94,11 @@ class Timer {
             let comparison_cell = this.table.rows[this.current_row].cells[2];
             // check if faster than best segment
             if (best_segment_diff.includes("-")) {
-                console.log("gold PogU: " + best_segment_diff);
                 comparison_cell.innerText = best_segment_diff;
                 // golden color
                 comparison_cell.style.color = "rgb(255, 215, 0)";
             }
             else {
-                console.log("green or red: " + previous_time_diff);
                 comparison_cell.innerText = previous_time_diff;
                 comparison_cell.style.color = comparison_cell.innerText.includes("-") ? "green" : "red";
             }
@@ -111,7 +108,6 @@ class Timer {
         // pause when all splits are done
         if (this.current_row == this.table.rows.length) {
             this.split_button.disabled = true;
-            this.current_row = 0;
             this.pause_timer();
         }
     }
@@ -196,7 +192,7 @@ class Timer {
         this.delete_button.disabled = true;
         // set transparent background when no splits were created (prevent black spot)
         if (this.table.rows.length == 0) {
-            this.table.style.background = transparent;
+            this.table.style.background = "transparent";
         }
     }
     
@@ -251,17 +247,37 @@ class Timer {
     }
     
     move_current_times() {
-        // move the current times to the previous times
-        for (let i = 0; i < this.table.rows.length; i++) {
-            // only move valid times
-            if (!this.table.rows[i].cells[1].innerText.includes("/")) {
-                // copy content of current time to previous time
-                let current_time = this.table.rows[i].cells[1].innerText;
-                this.table.rows[i].cells[3].innerText = current_time;
-                this.table.rows[i].cells[4].innerText = current_time;
-                // clear current time and time comparisons
-                this.table.rows[i].cells[1].innerText = "/";
-                this.table.rows[i].cells[2].innerText = "/";
+        // if run was completed
+        console.log("cr: " + this.current_row + " trl: " + this.table.rows.length);
+        if (this.current_row === this.table.rows.length) {
+            console.log("")
+            // move the current times to the previous times
+            for (let i = 0; i < this.table.rows.length; i++) {
+                // only move valid times
+                if (!this.table.rows[i].cells[1].innerText.includes("/")) {
+                    // copy content of current time to previous time
+                    let current_time = this.table.rows[i].cells[1].innerText;
+                    let comparison_cell = this.table.rows[i].cells[2];
+                    let best_segment_cell = this.table.rows[i].cells[4];
+                    // only change best segment if its a gold or empty
+                    if (comparison_cell.style.color == "rgb(255, 215, 0)" || best_segment_cell.innerText == "/") {
+                        best_segment_cell.innerText = current_time;
+                    }
+                    this.table.rows[i].cells[3].innerText = current_time;
+                    // clear current time and time comparisons
+                    this.table.rows[i].cells[1].innerText = "/";
+                    this.table.rows[i].cells[2].innerText = "/";
+                }
+            }
+        }
+        else {
+            // if run was not completed, then only move golds
+            for (let i = 0; i < this.table.rows.length; i++) {
+                let comparison_cell = this.table.rows[i].cells[2];
+                let best_segment_cell = this.table.rows[i].cells[4];
+                if (comparison_cell.style.color == "rgb(255, 215, 0)" || best_segment_cell.innerText == "/") {
+                    best_segment_cell.innerText = this.table.rows[i].cells[1].innerText;
+                }
             }
         }
     }
@@ -360,11 +376,10 @@ class Timer {
                     split_names[i] = this.table.rows[i].cells[0].innerText;
                     current_time = this.table.rows[i].cells[1].innerText;
                     comparison = this.table.rows[i].cells[2];
-                    console.log("comparison color: " + comparison.style.color);
                     // check if run was completely done
                     // only overwrite split_times when run was completed
-                    // current_row gets set to 0 after completition
-                    if (this.current_row === 0) {
+                    // current row is the same as rows length when done splitting
+                    if (this.current_row === this.table.rows.length) {
                         split_times[i] = current_time;
                     }
                     else {
@@ -377,9 +392,7 @@ class Timer {
                     // save best segment
                     // if there is none set already
                     // if its a gold - does not matter if run was finished or not
-                    if (best_segment == "/" || comparison.style.color == "rgb(255, 215, 0)") {
-                        best_segments[i] = best_segment == "/" ? split_times[i] : best_segment;
-                    }
+                    best_segments[i] = comparison.style.color == "rgb(255, 215, 0)" ? best_segment : split_times[i];
                 }
 
                 let dict = {};
@@ -391,7 +404,7 @@ class Timer {
             }
             this.move_current_times();
             // clear run after saving
-            this.clear_run();
+            this.stop_timer();
         }
     }
     
