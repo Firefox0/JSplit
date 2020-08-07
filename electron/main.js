@@ -19,15 +19,17 @@ function create_window() {
         minHeight: 300, 
         width: 400,
         height: 300,
+        icon: path.join(__dirname, "images/icon.ico"),
         // frame: false, // disabling because of issues with dragging and context menu
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
         } 
     });
     
+    
     // disable menu bar
     win.setMenu(null);
-    
+
     // create custom context menu
     const menu = new Menu();
     menu.append(new MenuItem({
