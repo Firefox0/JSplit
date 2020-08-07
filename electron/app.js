@@ -15,7 +15,7 @@ class Timer {
     current_row = 0;
     // splits selected
     amount_selected = 0;
-    
+
     splits_exist() {
         // true if at least one split exists
         // false otherwise
@@ -102,7 +102,6 @@ class Timer {
         // calculate time difference, but only if previous times exist
         let previous_time = this.splits.rows[this.current_row].cells[PB_TIME].innerText;
         if (previous_time !== "/") {
-            console.log("in here");
             let best_segment = this.splits.rows[this.current_row].cells[BS_TIME];
             let previous_time = this.splits.rows[this.current_row].cells[PB_TIME];
 
@@ -174,6 +173,9 @@ class Timer {
     }
     
     set_game() {
+        if (this.current_game.style.visibility == "hidden") {
+            this.current_game.style.visibility = "";
+        }
         this.current_game.innerText = this.user_input.value; 
         this.user_input.value = "";
         this.user_input.focus();
@@ -197,6 +199,10 @@ class Timer {
         this.start_time = null;
         this.current_row = 0;
         this.amount_selected = 0;
+
+        if (this.current_game.style.visibility != "hidden") {
+            this.current_game.style.visibility = "hidden";
+        }
     }
     
     delete_split() {
@@ -327,8 +333,7 @@ class Timer {
     }
     
     toggle_element(element) {
-        element.style.visibility == "hidden" ? element.removeAttribute("style") : 
-                                                element.style.visibility = "hidden";
+        elemen.style.visibility = element.style.visibility == "hidden" ? "" : "hidden";
     }
 
     toggle_buttons() {
@@ -514,6 +519,8 @@ class Timer {
         this.split_elements = document.getElementsByClassName("split-buttons");
 
         this.current_game = document.getElementById("game");
+        this.current_game.style.visibility = "hidden";
+
         this.set_game_button = document.getElementById("set-game-button");
         this.set_game_button.onclick = this.set_game.bind(this);
 
