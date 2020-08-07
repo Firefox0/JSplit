@@ -43,7 +43,6 @@ export function insert_zeros(num, length = 2) {
 }
 
 export function time_to_ms(time) {
-
     let new_parsed_times = [];
     let first_parse = time.split(":");
 
