@@ -9,12 +9,9 @@ const GOLD = "rgb(255, 215, 0)";
 
 class Timer {
 
-    // timer running
-    running = false;
-    // current row while splitting
+    timer_running = false;
     current_row = 0;
-    // splits selected
-    amount_selected = 0;
+    splits_selected = 0;
 
     splits_exist() {
         return this.splits.rows.length > 0;
@@ -33,7 +30,7 @@ class Timer {
         for (let i = 0; i < this.splits.rows.length; i++) {
             this.splits.rows[i].style.color = "";
         }
-        this.amount_selected = 0;
+        this.splits_selected = 0;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
     }
@@ -47,9 +44,8 @@ class Timer {
         this.insert_below_button.disabled = true;
         this.reset_button.disabled = false;
         this.start_button.disabled = true;
-        this.running = true;
+        this.timer_running = true;
 
-        // reset style colors in case rows are still selected
         if (this.splits_exist()) {
             for (let i = 0; i < this.splits.rows.length; i++) {
                 this.splits.rows[i].style.color = "";
@@ -65,7 +61,7 @@ class Timer {
         }
         
         let interval_id = setInterval((() => {
-            if (!this.running) {
+            if (!this.timer_running) {
                 if (this.splits.rows.length > 0) {  
                     let gold_exists = 0;
                     for (let i = 0; i < this.splits.rows.length; i++) {
@@ -136,7 +132,7 @@ class Timer {
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
         
-        this.running = false;
+        this.timer_running = false;
         this.start_time = null;
         this.timer_time.innerText = "00:00:00.000";
         this.current_row = 0;
@@ -147,7 +143,7 @@ class Timer {
     pause_timer() {
         this.start_button.disabled = false;
         this.pause_button.disabled = true;
-        this.running = false;
+        this.timer_running = false;
         this.pause_time = new Date().getTime();
     }
 
@@ -197,10 +193,10 @@ class Timer {
         this.timer_time.innerText = "00:00:00.000";
         this.delete_splits();
         
-        this.running = false;
+        this.timer_running = false;
         this.start_time = null;
         this.current_row = 0;
-        this.amount_selected = 0;
+        this.splits_selected = 0;
 
         if (this.current_game.style.visibility != "hidden") {
             this.current_game.style.visibility = "hidden";
@@ -211,7 +207,7 @@ class Timer {
         for (let i = 0; i < this.splits.rows.length; i++) {
             if (this.splits.rows[i].style.color == "black") {
                 this.splits.deleteRow(i);
-                this.amount_selected--;
+                this.splits_selected--;
                 // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
                 i--;
             }
@@ -221,7 +217,7 @@ class Timer {
         if (!this.splits_exist()) {
             this.splits.style.background = "transparent";
         }
-        if (!this.amount_selected) {
+        if (!this.splits_selected) {
             this.insert_above_button.disabled = true;
             this.insert_below_button.disabled = true;
         }
@@ -306,15 +302,15 @@ class Timer {
         // default color is empty even though it looks white
         if (e.style.color != "black") {
             e.style.color = "black";
-            this.amount_selected++;
+            this.splits_selected++;
         }
         else {
             e.style.color = "";
-            this.amount_selected--;
+            this.splits_selected--;
         }
-        if (this.amount_selected > 0) {
-            if (!this.running) {
-                if (this.amount_selected == 1) {
+        if (this.splits_selected > 0) {
+            if (!this.timer_running) {
+                if (this.splits_selected == 1) {
                     this.insert_above_button.disabled = false;
                     this.insert_below_button.disabled = false;
                 }
@@ -450,7 +446,7 @@ class Timer {
             else if (this.user_input !== document.activeElement) {
                 switch (key) {
                     case ("1"): 
-                        if (this.running) {
+                        if (this.timer_running) {
                             this.splits_exist() ?  this.split() : this.pause_timer();
                         }
                         else {
