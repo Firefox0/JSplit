@@ -17,20 +17,25 @@ class Timer {
     amount_selected = 0;
 
     splits_exist() {
-        // true if at least one split exists
-        // false otherwise
         return this.splits.rows.length > 0;
     }
 
     run_completed() {
-        // true if run is completed
-        // false otherwise
         if (this.splits_exist()) {
             if (this.current_row === this.splits.rows.length) {
                 return true;
             }
         }
         return false;
+    }
+
+    reset_splits_color() {
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            this.splits.rows[i].style.color = "";
+        }
+        this.amount_selected = 0;
+        this.insert_above_button.disabled = true;
+        this.insert_below_button.disabled = true;
     }
 
     start_timer() {
@@ -222,20 +227,12 @@ class Timer {
         }
     }
     
-    insert_above() {
+    insert_split(offset = 0) {
         for (let i = 0; i < this.splits.rows.length; i++) {
             if (this.splits.rows[i].style.color == "black") {
-            this.add_split(i);
+            this.add_split(i + offset);
+            this.reset_splits_color();
             return;
-            }
-        }
-    }
-    
-    insert_below() {
-        for (let i = 0; i < this.splits.rows.length; i++) {
-            if (this.splits.rows[i].style.color == "black") {
-                this.add_split(i + 1);
-                return;
             }
         }
     }
@@ -507,11 +504,11 @@ class Timer {
         this.delete_button.disabled = true;
 
         this.insert_above_button = document.getElementById("insert-above-button");
-        this.insert_above_button.onclick = this.insert_above.bind(this);
+        this.insert_above_button.onclick = this.insert_split.bind(this);
         this.insert_above_button.disabled = true;
 
         this.insert_below_button = document.getElementById("insert-below-button");
-        this.insert_below_button.onclick = this.insert_below.bind(this);
+        this.insert_below_button.onclick = (() => this.insert_split(1)).bind(this);
         this.insert_below_button.disabled = true;
 
         this.reset_button = document.getElementById("reset-button");
