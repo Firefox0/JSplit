@@ -206,6 +206,7 @@ class Timer {
         for (let i = 0; i < this.splits.rows.length; i++) {
             if (this.splits.rows[i].style.color == "black") {
                 this.splits.deleteRow(i);
+                this.amount_selected--;
                 // decrement to make sure that you iterate through all elements (otherwise skip after deletion)
                 i--;
             }
@@ -214,6 +215,10 @@ class Timer {
         // set transparent background when no splits were created (prevent black spot)
         if (!this.splits_exist()) {
             this.splits.style.background = "transparent";
+        }
+        if (!this.amount_selected) {
+            this.insert_above_button.disabled = true;
+            this.insert_below_button.disabled = true;
         }
     }
     
@@ -310,7 +315,6 @@ class Timer {
             e.style.color = "";
             this.amount_selected--;
         }
-        
         if (this.amount_selected > 0) {
             if (!this.running) {
                 if (this.amount_selected == 1) {
@@ -397,7 +401,7 @@ class Timer {
                 dict["game_name"] = this.current_game.innerText;
                 dict["split_names"] = split_names;
                 dict["split_times"] = split_times;
-                dict["best_segments"] = best_segments;
+                dict["best_segment_times"] = best_segments;
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.move_current_times();
@@ -420,7 +424,7 @@ class Timer {
                 row.insertCell(SPLIT_TIME).innerText = "/";
                 row.insertCell(COMPARISON).innerText = "/";                
                 row.insertCell(PB_TIME).innerText = splits["split_times"][i];
-                row.insertCell(BS_TIME).innerText = splits["best_segments"][i];
+                row.insertCell(BS_TIME).innerText = splits["best_segment_times"][i];
 
                 for (let i = 1; i < row.length; i++) {
                     row.cells[i].style.textAlign = "right";
