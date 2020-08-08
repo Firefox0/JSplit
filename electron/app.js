@@ -62,7 +62,7 @@ class Timer {
         
         let interval_id = setInterval((() => {
             if (!this.timer_running) {
-                if (this.splits.rows.length > 0) {  
+                if (this.splits_exist()) {  
                     let gold_exists = 0;
                     for (let i = 0; i < this.splits.rows.length; i++) {
                         let current_comparison_color = this.splits.rows[i].cells[COMPARISON].style.color;
@@ -136,19 +136,20 @@ class Timer {
         this.start_time = null;
         this.timer_time.innerText = "00:00:00.000";
         this.current_row = 0;
-        
-        this.clear_run();
     }
     
     pause_timer() {
         this.start_button.disabled = false;
         this.pause_button.disabled = true;
+
         this.timer_running = false;
+
         this.pause_time = new Date().getTime();
     }
 
     add_split(row_index = -1) {
         this.split_button.disabled = false;
+
         let content = this.user_input.value;
         if (content) {
             // add row and keep count of splits
@@ -241,7 +242,7 @@ class Timer {
     
     set_transparent_background() {
         // set background when there is atleast one split (prevent black spot)
-        if (this.splits.rows.length > 0) {
+        if (this.splits_exist()) {
             if (this.splits.style.background == "transparent") {
                 this.splits.style.background = "rgba(0, 0, 0, 0.25)";
             }
@@ -348,13 +349,10 @@ class Timer {
     }
     
     save_split(state) {
-        // if yes was pressed
         if (state == "0") {
-            // request to choose directory
             this.request_pick_directory();
         }
         else {
-            // clear run if not deciding to save
             this.clear_run();
         }
     }
@@ -377,17 +375,16 @@ class Timer {
                     split_names[i] = this.splits.rows[i].cells[SPLIT_NAME].innerText;
                     current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
 
-                    // only overwrite split_times when run was completed
                     if (this.run_completed()) {
                         split_times[i] = current_time;
                     }
                     else {
-                        split_times[i] = current_time == "/" ? this.splits.rows[i].cells[PB_TIME].innerText : current_time;
+                        split_times[i] = split_times[i] == "/" ? current_time : this.splits.rows[i].cells[PB_TIME].innerText;
                     }
-                    
+
                     comparison = this.splits.rows[i].cells[COMPARISON];
                     best_segment = this.splits.rows[i].cells[BS_TIME].innerText;
-                    best_segments[i] = comparison.style.color == GOLD ? best_segment : split_times[i];
+                    best_segments[i] = comparison.style.color == GOLD ? current_time : best_segment;
                 }
                 
                 let dict = {};
@@ -399,6 +396,7 @@ class Timer {
             }
             this.move_current_times();
             this.stop_timer();
+            this.clear_run();
         }
     }
     
