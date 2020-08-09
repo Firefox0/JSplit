@@ -13,11 +13,8 @@ class Split {
         this.append_button.disabled = false;
         
         this.user_input.value = "";
-        this.timer_time.innerText = "00:00:00.000";
         this.delete_splits();
         
-        this.timer_running = false;
-        this.start_time = null;
         this.current_row = 0;
         this.splits_selected = 0;
     
@@ -41,6 +38,8 @@ class Split {
         this.current_game.innerText = this.user_input.value; 
         this.user_input.value = "";
         this.user_input.focus();
+
+        this.reset_button.disabled = false;
     }
     
     add_split(row_index = -1) {
@@ -62,7 +61,10 @@ class Split {
         }
         // focus after add was pressed
         this.user_input.focus();
+        this.reset_splits_color();
         this.set_transparent_background();
+
+        this.reset_button.disabled = false;
     }
 
     delete_split() {
@@ -197,7 +199,6 @@ class Split {
 
         this.reset_button = document.getElementById("reset-button");
         this.reset_button.onclick = this.reset.bind(this);
-        this.reset_button.disabled = true;
 
         this.split_elements = document.getElementsByClassName("split-buttons");
 
@@ -212,6 +213,7 @@ class Split {
 
         this.start_ipc();
         this.get_splits();
+        common.set_transparent_background(this.splits);
     }
 }
 
