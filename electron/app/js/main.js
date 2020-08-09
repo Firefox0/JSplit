@@ -8,8 +8,6 @@ const {readFileSync} = require("fs");
 
 let win;
 let split_win;
-let loaded_split = null;
-let image_path = null;
 let json_filter = [{name: "json", extensions: ["json"]}];
 let default_window_settings = {
     minWidth: 400, 
@@ -42,14 +40,14 @@ function create_window() {
     menu.append(new MenuItem({
         label: "Load Split",
         click: () => {
-            loaded_split = load_split();
+            win.webContents.send("set-loaded-splits", load_split());
         }
     }));
     
     menu.append(new MenuItem({
         label: "Set Background",
         click: () => {
-            image_path = pick_image();
+            win.webContents.send("set-background", pick_image());
         }
     }));
     
@@ -84,14 +82,7 @@ function create_split_win() {
     menu.append(new MenuItem({
         label: "Load Split",
         click: () => {
-            loaded_split = load_split();
-        }
-    }));
-    
-    menu.append(new MenuItem({
-        label: "Set Background",
-        click: () => {
-            image_path = pick_image();
+            split_win.webContents.send("set-loaded-splits", load_split());
         }
     }));
     
@@ -152,14 +143,6 @@ function pick_image(message) {
     return files ? files[0] : null;
 }
 
-// send context menu item state
-ipcMain.on("get-load-split", (event, arg) => {
-    if (loaded_split) {
-        event.sender.send("get-load-split-response", loaded_split);
-        loaded_split = null;
-    }
-});
-
 // open dialog to save split
 ipcMain.on("get-save-split", (event, arg) => {
     event.sender.send("get-save-split-response", save_split(
@@ -168,13 +151,6 @@ ipcMain.on("get-save-split", (event, arg) => {
     
 ipcMain.on("get-directory", (event, arg) => {
     event.sender.send("get-directory-response", pick_directory());
-});
-
-ipcMain.on("get-image-path", (event, arg) => {
-    if (image_path) {
-        event.sender.send("get-image-path-response", image_path);
-        image_path = null;
-    }
 });
 
 ipcMain.on("request-splits", (event, arg) => {
