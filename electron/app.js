@@ -11,7 +11,6 @@ class Timer {
 
     timer_running = false;
     current_row = 0;
-    splits_selected = 0;
 
     splits_exist() {
         return this.splits.rows.length > 0;
@@ -273,11 +272,11 @@ class Timer {
         }
     }
     
-    load_split(splits_json) {
-        if (splits_json) {
+    load_split(data, json=true) {
+        if (data) {
             this.split_button.disabled = false;
             this.delete_splits();
-            let splits = JSON.parse(splits_json);
+            let splits = json ? JSON.parse(data) : data;
             this.current_game.innerText = splits["game_name"];
             this.current_game.style.visibility = "";
             for (let i = 0; i < splits["split_names"].length; i++) {
@@ -312,6 +311,9 @@ class Timer {
         ipc_receive("get-directory-response", this.pick_directory.bind(this));
         ipc_receive("get-image-path-response", this.change_background.bind(this));
         ipc_receive("request-splits", this.transfer_splits.bind(this));
+        ipc_receive("edited-splits", (arg) => {
+            this.load_split(arg, false);
+        })
     }
     
     key_listener() {
