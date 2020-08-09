@@ -3,6 +3,7 @@ const SPLIT_TIME = 1;
 const COMPARISON = 2;
 const PB_TIME = 3;
 const BS_TIME = 4;
+const GOLD = "rgb(255, 215, 0)";
 
 class Split {
     
@@ -11,6 +12,15 @@ class Split {
 
     splits_exist() {
         return this.splits.rows.length > 0;
+    }
+
+    run_completed() {
+        if (this.splits_exist()) {
+            if (this.current_row === this.splits.rows.length) {
+                return true;
+            }
+        }
+        return false;
     }
 
     reset() {
@@ -142,6 +152,39 @@ class Split {
         }
     }
 
+    table_to_dict() {
+        let split_names = [];
+        let split_times = []; 
+        let best_segments = [];
+        
+        let current_time = null;
+        let comparison = null;
+        let best_segment = null; 
+        
+        for (let i = 0; i < this.splits.rows.length; i++) {                    
+            split_names[i] = this.splits.rows[i].cells[SPLIT_NAME].innerText;
+            current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
+
+            if (this.run_completed()) {
+                split_times[i] = current_time;
+            }
+            else {
+                split_times[i] = split_times[i] == "/" ? current_time : this.splits.rows[i].cells[PB_TIME].innerText;
+            }
+
+            comparison = this.splits.rows[i].cells[COMPARISON];
+            best_segment = this.splits.rows[i].cells[BS_TIME].innerText;
+            best_segments[i] = comparison.style.color == GOLD ? current_time : best_segment;
+        }
+        
+        let dict = {};
+        dict["game_name"] = this.current_game.innerText;
+        dict["split_names"] = split_names;
+        dict["split_times"] = split_times;
+        dict["best_segment_times"] = best_segments;
+        return dict;
+    }
+
     dict_to_table(splits) {
         this.current_game.innerText = splits["game_name"];
         this.current_game.style.visibility = "";
@@ -178,6 +221,9 @@ class Split {
         ipc_receive("request-splits-response", (arg => this.dict_to_table(arg)).bind(this));
     }
 
+    save() {
+        ipc_send("edited-splits", this.table_to_dict());
+    }
 
     main() {
         this.splits = document.getElementById("table");
@@ -211,6 +257,9 @@ class Split {
 
         this.set_game_button = document.getElementById("set-game-button");
         this.set_game_button.onclick = this.set_game.bind(this);
+
+        this.save_button = document.getElementById("save-button");
+        this.save_button.onclick = this.save.bind(this);
 
         this.start_ipc();
         this.get_splits();
