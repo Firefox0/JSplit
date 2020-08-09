@@ -61,13 +61,9 @@ class Timer {
 
     start_timer() {
 
+        this.start_button.disabled = true;
         this.stop_button.disabled = false;
         this.pause_button.disabled = false;
-        this.append_button.disabled = true;
-        this.insert_above_button.disabled = true;
-        this.insert_below_button.disabled = true;
-        this.reset_button.disabled = false;
-        this.start_button.disabled = true;
         this.timer_running = true;
 
         if (this.splits_exist()) {
@@ -266,10 +262,7 @@ class Timer {
     }
     
     pick_directory(directory) {
-        // only if directory was chosen, maybe remember this
         if (directory) {
-            this.append_button.disabled = false;
-            // save times
             if (this.splits_exist()) {
                 let dict = this.table_to_dict();
                 write_file(directory, JSON.stringify(dict), "utf-8");
