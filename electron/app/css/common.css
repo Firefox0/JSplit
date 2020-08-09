@@ -1,0 +1,32 @@
+* { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    color: white;
+}
+
+.buttons * {
+    width: 80;
+    height: 25;
+}
+
+#table {
+    /*border: 1px solid black;*/
+    /* prevent from touching the border */
+    padding: 5; 
+    /* prevent elements from almost touching each other */
+    border-spacing: 10;
+    width: 310;
+    /* prevent highlighting for smoother user experience while selecting rows */
+    user-select: none;
+    /* auto width (for background) */
+    width: auto;
+}
