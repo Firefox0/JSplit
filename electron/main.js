@@ -12,7 +12,8 @@ let loaded_split = null;
 let image_path = null;
 let json_filter = [{name: "json", extensions: ["json"]}];
 let receive_splits = false;
-let splits = [];
+let splits;
+let split_splits;
 
 function create_window() {
 
@@ -74,8 +75,6 @@ function create_window() {
 
 function create_split_win() {
 
-    win.hide();
-
     // create browser window
     split_win = new BrowserWindow({
         minWidth: 400, 
@@ -121,10 +120,6 @@ function create_split_win() {
         protocol: "file:",
         slashes: true
     }));
-
-    split_win.on("closed", (e) => {
-        e.preventDefault();
-        win.show()});
 }
 
 function load_split() {
@@ -199,6 +194,10 @@ ipcMain.on("request-splits", (event, arg) => {
 
 ipcMain.on("request-splits-response", (event, arg) => {
     split_win.webContents.send("request-splits-response", arg);
+});
+
+ipcMain.on("edited-splits", (event, arg) => {
+    win.webContents.send("edited-splits", arg)
 });
 
 // run create window function
