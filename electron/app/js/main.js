@@ -11,24 +11,22 @@ let split_win;
 let loaded_split = null;
 let image_path = null;
 let json_filter = [{name: "json", extensions: ["json"]}];
-let receive_splits = false;
-let splits;
-let split_splits;
+let default_window_settings = {
+    minWidth: 400, 
+    minHeight: 300, 
+    width: 400,
+    height: 300,
+    fullscreenable: false,
+    icon: path.join(__dirname, "../../images/icon.ico"),
+    webPreferences: {
+        preload: path.join(__dirname, "preload.js")
+    } 
+} 
 
 function create_window() {
 
     // create browser window
-    win = new BrowserWindow({
-        minWidth: 400, 
-        minHeight: 300, 
-        width: 400,
-        height: 300,
-        icon: path.join(__dirname, "../../images/icon.ico"),
-        webPreferences: {
-            preload: path.join(__dirname, "preload.js")
-        } 
-    });
-    
+    win = new BrowserWindow(default_window_settings);
     
     // disable menu bar
     win.setMenu(null);
@@ -76,16 +74,7 @@ function create_window() {
 function create_split_win() {
 
     // create browser window
-    split_win = new BrowserWindow({
-        minWidth: 400, 
-        minHeight: 300, 
-        width: 400,
-        height: 300,
-        icon: path.join(__dirname, "../../images/icon.ico"),
-        webPreferences: {
-            preload: path.join(__dirname, "preload.js")
-        } 
-    });
+    split_win = new BrowserWindow(default_window_settings);
     
     // disable menu bar
     split_win.setMenu(null);
