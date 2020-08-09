@@ -8,6 +8,10 @@ class Split {
     
     splits = [];
     
+    splits_exist() {
+        return this.splits.rows.length > 0;
+    }
+
     reset() {
         this.stop_button.disabled = true;
         this.pause_button.disabled = true;
@@ -50,8 +54,6 @@ class Split {
     }
     
     add_split(row_index = -1) {
-        this.split_button.disabled = false;
-
         let content = this.user_input.value;
         if (content) {
             // add row and keep count of splits
@@ -103,6 +105,15 @@ class Split {
         }
     }
 
+    reset_splits_color() {
+        for (let i = 0; i < this.splits.rows.length; i++) {
+            this.splits.rows[i].style.color = "";
+        }
+        this.splits_selected = 0;
+        this.insert_above_button.disabled = true;
+        this.insert_below_button.disabled = true;
+    }
+    
     select_row(e) {
         // default color is empty even though it looks white
         if (e.style.color != "black") {
@@ -146,6 +157,15 @@ class Split {
 
             for (let i = 1; i < row.length; i++) {
                 row.cells[i].style.textAlign = "right";
+            }
+        }
+    }
+
+    set_transparent_background() {
+        // set background when there is atleast one split (prevent black spot)
+        if (this.splits_exist()) {
+            if (this.splits.style.background == "transparent") {
+                this.splits.style.background = "rgba(0, 0, 0, 0.25)";
             }
         }
     }
