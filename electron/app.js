@@ -26,15 +26,6 @@ class Timer {
         return false;
     }
 
-    reset_splits_color() {
-        for (let i = 0; i < this.splits.rows.length; i++) {
-            this.splits.rows[i].style.color = "";
-        }
-        this.splits_selected = 0;
-        this.insert_above_button.disabled = true;
-        this.insert_below_button.disabled = true;
-    }
-
     table_to_dict() {
         let split_names = [];
         let split_times = []; 
