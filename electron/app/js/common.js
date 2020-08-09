@@ -32,7 +32,7 @@ export function set_transparent_background(splits) {
     }
 }
 
-export function table_to_dict(current_row, splits) {
+export function table_to_dict(current_row, splits, current_game) {
     let split_names = [];
     let split_times = []; 
     let best_segments = [];
@@ -42,19 +42,19 @@ export function table_to_dict(current_row, splits) {
     let best_segment = null; 
     
     for (let i = 0; i < splits.rows.length; i++) {                    
-        split_names[i] = splits.rows[i].cells[common.SPLIT_NAME].innerText;
-        current_time = splits.rows[i].cells[common.SPLIT_TIME].innerText;
+        split_names[i] = splits.rows[i].cells[SPLIT_NAME].innerText;
+        current_time = splits.rows[i].cells[SPLIT_TIME].innerText;
 
         if (run_completed(current_row, splits)) {
             split_times[i] = current_time;
         }
         else {
-            split_times[i] = split_times[i] == "/" ? current_time : splits.rows[i].cells[common.PB_TIME].innerText;
+            split_times[i] = split_times[i] == "/" ? current_time : splits.rows[i].cells[PB_TIME].innerText;
         }
 
-        comparison = splits.rows[i].cells[common.COMPARISON];
-        best_segment = splits.rows[i].cells[common.BS_TIME].innerText;
-        best_segments[i] = comparison.style.color == common.GOLD ? current_time : best_segment;
+        comparison = splits.rows[i].cells[COMPARISON];
+        best_segment = splits.rows[i].cells[BS_TIME].innerText;
+        best_segments[i] = comparison.style.color == GOLD ? current_time : best_segment;
     }
     
     let dict = {};

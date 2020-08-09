@@ -49,7 +49,7 @@ class Split {
             // add row and keep count of splits
             let row = this.splits.insertRow(row_index);
             row.onclick = (() => this.select_row(row)).bind(this);
-            let split_name = row.insertCell(SPLIT_NAME);
+            let split_name = row.insertCell(common.SPLIT_NAME);
             split_name.innerText = content;
             // create cells for current time, comparison and previous time
             for (let i = 1; i <= 4; i++) {
@@ -141,11 +141,11 @@ class Split {
             let row = this.splits.insertRow(-1);
             row.onclick = (() => this.select_row(row)).bind(this);
 
-            row.insertCell(SPLIT_NAME).innerText = splits["split_names"][i];
-            row.insertCell(SPLIT_TIME).innerText = "/";
-            row.insertCell(COMPARISON).innerText = "/";                
-            row.insertCell(PB_TIME).innerText = splits["split_times"][i];
-            row.insertCell(BS_TIME).innerText = splits["best_segment_times"][i];
+            row.insertCell(common.SPLIT_NAME).innerText = splits["split_names"][i];
+            row.insertCell(common.SPLIT_TIME).innerText = "/";
+            row.insertCell(common.COMPARISON).innerText = "/";                
+            row.insertCell(common.PB_TIME).innerText = splits["split_times"][i];
+            row.insertCell(common.BS_TIME).innerText = splits["best_segment_times"][i];
 
             for (let i = 1; i < row.length; i++) {
                 row.cells[i].style.textAlign = "right";
@@ -171,7 +171,7 @@ class Split {
     }
 
     save() {
-        ipc_send("edited-splits", common.table_to_dict(this.current_row, this.splits));
+        ipc_send("edited-splits", common.table_to_dict(this.current_row, this.splits, this.current_game));
     }
 
     main() {

@@ -194,7 +194,7 @@ class Timer {
     pick_directory(directory) {
         if (directory) {
             if (common.splits_exist(this.splits)) {
-                let dict = common.table_to_dict(this.current_row, this.splits);
+                let dict = common.table_to_dict(this.current_row, this.splits, this.current_game);
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.move_current_times();
@@ -229,7 +229,7 @@ class Timer {
     }
 
     transfer_splits() {
-        let dict = common.table_to_dict(this.current_row, this.splits);
+        let dict = common.table_to_dict(this.current_row, this.splits, this.current_game);
         ipc_send("request-splits-response", dict);
     }
 
