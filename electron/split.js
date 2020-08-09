@@ -7,19 +7,17 @@ const BS_TIME = 4;
 class Split {
     
     splits = [];
-    
+    splits_selected = 0;
+
     splits_exist() {
         return this.splits.rows.length > 0;
     }
 
     reset() {
-        this.stop_button.disabled = true;
-        this.pause_button.disabled = true;
         this.delete_button.disabled = true;
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
         this.reset_button.disabled = true;
-        this.start_button.disabled = false;
         this.append_button.disabled = false;
         
         this.user_input.value = "";
@@ -98,9 +96,9 @@ class Split {
     insert_split(offset = 0) {
         for (let i = 0; i < this.splits.rows.length; i++) {
             if (this.splits.rows[i].style.color == "black") {
-            this.add_split(i + offset);
-            this.reset_splits_color();
-            return;
+                this.add_split(i + offset);
+                this.reset_splits_color();
+                return;
             }
         }
     }
@@ -113,7 +111,7 @@ class Split {
         this.insert_above_button.disabled = true;
         this.insert_below_button.disabled = true;
     }
-    
+
     select_row(e) {
         // default color is empty even though it looks white
         if (e.style.color != "black") {
@@ -138,6 +136,8 @@ class Split {
             this.delete_button.disabled = false;
         }
         else {
+            this.insert_above_button.disabled = true;
+            this.insert_below_button.disabled = true;
             this.delete_button.disabled = true;
         }
     }
@@ -193,7 +193,7 @@ class Split {
         this.delete_button.disabled = true;
 
         this.insert_above_button = document.getElementById("insert-above-button");
-        this.insert_above_button.onclick = this.insert_split.bind(this);
+        this.insert_above_button.onclick = (() => this.insert_split()).bind(this);
         this.insert_above_button.disabled = true;
 
         this.insert_below_button = document.getElementById("insert-below-button");
