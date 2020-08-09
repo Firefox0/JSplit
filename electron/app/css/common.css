@@ -18,6 +18,11 @@ body {
     height: 25;
 }
 
+#time {
+    text-align: center;
+    text-shadow: black;
+}
+
 #table {
     /*border: 1px solid black;*/
     /* prevent from touching the border */
@@ -29,4 +34,8 @@ body {
     user-select: none;
     /* auto width (for background) */
     width: auto;
+}
+
+#background-image {
+    background-size: cover;
 }
