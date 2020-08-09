@@ -236,13 +236,10 @@ class Timer {
     }
 
     start_ipc() {
-        setInterval(() => ipc_send("get-load-split", ""), 10);
-        setInterval(() => ipc_send("get-image-path", ""), 10);
-        
-        ipc_receive("get-load-split-response", this.load_split.bind(this));
+        ipc_receive("set-loaded-splits", this.load_split.bind(this));
         ipc_receive("get-save-split-response", this.save_split.bind(this));
         ipc_receive("get-directory-response", this.pick_directory.bind(this));
-        ipc_receive("get-image-path-response", this.change_background.bind(this));
+        ipc_receive("set-background", this.change_background.bind(this));
         ipc_receive("request-splits", this.transfer_splits.bind(this));
         ipc_receive("edited-splits", (arg) => {
             this.load_split(arg, false);
