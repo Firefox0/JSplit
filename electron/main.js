@@ -7,9 +7,12 @@ const url = require("url");
 const {readFileSync} = require("fs");
 
 let win;
+let split_win;
 let loaded_split = null;
 let image_path = null;
 let json_filter = [{name: "json", extensions: ["json"]}];
+let receive_splits = false;
+let splits = [];
 
 function create_window() {
 
@@ -20,7 +23,6 @@ function create_window() {
         width: 400,
         height: 300,
         icon: path.join(__dirname, "images/icon.ico"),
-        // frame: false, // disabling because of issues with dragging and context menu
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
         } 
@@ -32,6 +34,12 @@ function create_window() {
 
     // create custom context menu
     const menu = new Menu();
+
+    menu.append(new MenuItem({
+        label: "Edit Split",
+        click: create_split_win
+    }))
+
     menu.append(new MenuItem({
         label: "Load Split",
         click: () => {
@@ -60,8 +68,63 @@ function create_window() {
         protocol: "file:",
         slashes: true
     }));
-
+    
     win.on("closed", () => win = null);
+}
+
+function create_split_win() {
+
+    win.hide();
+
+    // create browser window
+    split_win = new BrowserWindow({
+        minWidth: 400, 
+        minHeight: 300, 
+        width: 400,
+        height: 300,
+        icon: path.join(__dirname, "images/icon.ico"),
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js")
+        } 
+    });
+    
+    // disable menu bar
+    split_win.setMenu(null);
+
+    // create custom context menu
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: "Load Split",
+        click: () => {
+            loaded_split = load_split();
+        }
+    }));
+    
+    menu.append(new MenuItem({
+        label: "Set Background",
+        click: () => {
+            image_path = pick_image();
+        }
+    }));
+    
+    // attach context menu to app
+    split_win.webContents.on("context-menu", (e, params) => {
+        menu.popup(split_win, params.x, params.y)
+    });
+    
+    // open dev tools on start
+    split_win.webContents.openDevTools();
+    
+    // load index.html
+    split_win.loadURL(url.format({
+        pathname: path.join(__dirname, "split.html"),
+        protocol: "file:",
+        slashes: true
+    }));
+
+    split_win.on("closed", (e) => {
+        e.preventDefault();
+        win.show()});
 }
 
 function load_split() {
@@ -87,7 +150,6 @@ function save_split(message) {
     })
 }
 
-// choose directory
 function pick_directory(message) {
     const files = dialog.showOpenDialogSync(win, {
         filters: json_filter,
@@ -131,6 +193,14 @@ ipcMain.on("get-image-path", (event, arg) => {
     }
 });
 
+ipcMain.on("request-splits", (event, arg) => {
+    win.webContents.send("request-splits", "");
+});
+
+ipcMain.on("request-splits-response", (event, arg) => {
+    split_win.webContents.send("request-splits-response", arg);
+});
+
 // run create window function
 app.on("ready", () => create_window())
 
@@ -141,3 +211,4 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
+
