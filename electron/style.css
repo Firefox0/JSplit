@@ -5,7 +5,6 @@
 }
 
 body {
-    height: 100vh;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -29,10 +28,10 @@ body {
 
 #time {
     text-align: center;
+    text-shadow: black;
 }
 
-.timer-buttons * , 
-.split-buttons * {
+.timer-buttons * {
     width: 80;
     height: 25;
 }
@@ -40,4 +39,8 @@ body {
 #user-input {
     width: 307.5;
     height: 25;
+}
+
+#background-image {
+    background-size: cover;
 }
