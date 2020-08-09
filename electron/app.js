@@ -35,6 +35,39 @@ class Timer {
         this.insert_below_button.disabled = true;
     }
 
+    table_to_dict() {
+        let split_names = [];
+        let split_times = []; 
+        let best_segments = [];
+        
+        let current_time = null;
+        let comparison = null;
+        let best_segment = null; 
+        
+        for (let i = 0; i < this.splits.rows.length; i++) {                    
+            split_names[i] = this.splits.rows[i].cells[SPLIT_NAME].innerText;
+            current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
+
+            if (this.run_completed()) {
+                split_times[i] = current_time;
+            }
+            else {
+                split_times[i] = split_times[i] == "/" ? current_time : this.splits.rows[i].cells[PB_TIME].innerText;
+            }
+
+            comparison = this.splits.rows[i].cells[COMPARISON];
+            best_segment = this.splits.rows[i].cells[BS_TIME].innerText;
+            best_segments[i] = comparison.style.color == GOLD ? current_time : best_segment;
+        }
+        
+        let dict = {};
+        dict["game_name"] = this.current_game.innerText;
+        dict["split_names"] = split_names;
+        dict["split_times"] = split_times;
+        dict["best_segment_times"] = best_segments;
+        return dict;
+    }
+
     start_timer() {
 
         this.stop_button.disabled = false;
@@ -363,35 +396,7 @@ class Timer {
             this.append_button.disabled = false;
             // save times
             if (this.splits_exist()) {
-                let split_names = [];
-                let split_times = []; 
-                let best_segments = [];
-                
-                let current_time = null;
-                let comparison = null;
-                let best_segment = null; 
-                
-                for (let i = 0; i < this.splits.rows.length; i++) {                    
-                    split_names[i] = this.splits.rows[i].cells[SPLIT_NAME].innerText;
-                    current_time = this.splits.rows[i].cells[SPLIT_TIME].innerText;
-
-                    if (this.run_completed()) {
-                        split_times[i] = current_time;
-                    }
-                    else {
-                        split_times[i] = split_times[i] == "/" ? current_time : this.splits.rows[i].cells[PB_TIME].innerText;
-                    }
-
-                    comparison = this.splits.rows[i].cells[COMPARISON];
-                    best_segment = this.splits.rows[i].cells[BS_TIME].innerText;
-                    best_segments[i] = comparison.style.color == GOLD ? current_time : best_segment;
-                }
-                
-                let dict = {};
-                dict["game_name"] = this.current_game.innerText;
-                dict["split_names"] = split_names;
-                dict["split_times"] = split_times;
-                dict["best_segment_times"] = best_segments;
+                let dict = this.table_to_dict();
                 write_file(directory, JSON.stringify(dict), "utf-8");
             }
             this.move_current_times();
@@ -425,6 +430,11 @@ class Timer {
         }
     }
 
+    transfer_splits() {
+        let dict = this.table_to_dict();
+        ipc_send("request-splits-response", dict);
+    }
+
     start_ipc() {
         setInterval(() => ipc_send("get-load-split", ""), 10);
         setInterval(() => ipc_send("get-image-path", ""), 10);
@@ -433,6 +443,7 @@ class Timer {
         ipc_receive("get-save-split-response", this.save_split.bind(this));
         ipc_receive("get-directory-response", this.pick_directory.bind(this));
         ipc_receive("get-image-path-response", this.change_background.bind(this));
+        ipc_receive("request-splits", this.transfer_splits.bind(this));
     }
     
     key_listener() {
