@@ -164,17 +164,6 @@ class Timer {
         }
     }
     
-    toggle_element(element) {
-        elemen.style.visibility = element.style.visibility == "hidden" ? "" : "hidden";
-    }
-
-    toggle_buttons() {
-        this.toggle_element(this.user_input);
-        for (let i = 0; i < this.split_elements.length; i++) {
-            this.toggle_element(this.split_elements[i]);
-        }
-    }
-    
     request_save_split() {
         // request to show dialog
         ipc_send("get-save-split", "");
@@ -249,31 +238,26 @@ class Timer {
     key_listener() {
             document.addEventListener("keydown", event => {
             const key = event.key;
-            if (key === "Enter") {
-                this.add_split();
-            }
-            else if (this.user_input !== document.activeElement) {
-                switch (key) {
-                    case ("1"): 
-                        if (this.timer_running) {
-                            common.splits_exist(this.splits) ?  this.split() : this.pause_timer();
-                        }
-                        else {
-                            this.start_timer();
-                        }
-                        break;
-                    case ("2"):
-                        this.toggle_buttons();
-                        break;
-                    case ("3"):
-                        this.stop_timer();
-                        break;
-                    case ("5"):
-                        this.pause_timer();
-                        break;
-                    default:
-                        console.log(key);
-                }
+            switch (key) {
+                case ("1"): 
+                    if (this.timer_running) {
+                        common.splits_exist(this.splits) ?  this.split() : this.pause_timer();
+                    }
+                    else {
+                        this.start_timer();
+                    }
+                    break;
+                case ("2"):
+                    common.toggle_visibility(this.buttons);
+                    break;
+                case ("3"):
+                    this.stop_timer();
+                    break;
+                case ("5"):
+                    this.pause_timer();
+                    break;
+                default:
+                    console.log(key);
             }
         });
     }
@@ -303,6 +287,8 @@ class Timer {
         
         this.current_game = document.getElementById("game");
         this.current_game.style.visibility = "hidden";
+
+        this.buttons = document.getElementsByClassName("buttons");
 
         this.start_ipc();
         this.key_listener();
