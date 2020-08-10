@@ -3,6 +3,7 @@ export const SPLIT_TIME = 1;
 export const COMPARISON = 2;
 export const PB_TIME = 3;
 export const BS_TIME = 4;
+export const GOLD = "rgb(255, 215, 0)";
 
 export function splits_exist(splits) {
     return splits.rows.length > 0;
