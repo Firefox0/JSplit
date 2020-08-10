@@ -74,7 +74,7 @@ export function load_split(data, table, current_game, instance=null, json=true) 
         for (let i = 0; i < splits["split_names"].length; i++) {
             let row = table.insertRow(-1);
             if (instance) {
-                row.onclick = (() => instance.select_row(row)).bind(instance);
+                row.onclick = () => instance.select_row(row);
             }
 
             row.insertCell(SPLIT_NAME).innerText = splits["split_names"][i];
