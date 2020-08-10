@@ -170,10 +170,19 @@ class Split {
 
     start_ipc() {
         ipc_receive("request-splits-response", (arg => this.dict_to_table(arg)).bind(this));
+        ipc_receive("set-loaded-splits", )
     }
 
     save() {
         ipc_send("edited-splits", common.table_to_dict(this.current_row, this.splits, this.current_game));
+    }
+
+    key_listener() {
+        document.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+            this.add_split();
+            }
+        });
     }
 
     main() {
@@ -214,6 +223,7 @@ class Split {
         this.start_ipc();
         this.get_splits();
         common.set_transparent_background(this.splits);
+        this.key_listener();
     }
 }
 
