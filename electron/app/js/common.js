@@ -63,3 +63,13 @@ export function table_to_dict(current_row, splits, current_game) {
     dict["best_segment_times"] = best_segments;
     return dict;
 }
+
+export function toggle_element(element) {
+    element.style.visibility = element.style.visibility == "hidden" ? "" : "hidden";
+}
+
+export function toggle_visibility(elements) {
+    for (let i = 0; i < elements.length; i++) {
+        toggle_element(elements[i]);
+    }
+}
