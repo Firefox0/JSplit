@@ -169,7 +169,15 @@ class Split {
     }
 
     start_ipc() {
-        ipc_receive("request-splits-response", (arg => this.dict_to_table(arg)).bind(this));
+        ipc_receive("request-splits-response", (arg => {
+            this.dict_to_table(arg);
+            try {
+                if (common.splits_exist(this.splits)) {
+                    common.set_transparent_background(this.splits);
+                }
+            }
+            catch {};
+        }).bind(this));
         ipc_receive("set-loaded-splits", )
     }
 
@@ -222,7 +230,6 @@ class Split {
 
         this.start_ipc();
         this.get_splits();
-        common.set_transparent_background(this.splits);
         this.key_listener();
     }
 }
