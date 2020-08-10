@@ -1,8 +1,6 @@
 import * as time from "./time.js";
 import * as common from "./common.js";
 
-const GOLD = "rgb(255, 215, 0)";
-
 class Timer {
 
     timer_running = false;
