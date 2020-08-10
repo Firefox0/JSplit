@@ -162,6 +162,16 @@ class Timer {
         }
     }
     
+    toggle_element(element) {
+        element.style.visibility = element.style.visibility == "hidden" ? "" : "hidden";
+    }
+
+    toggle_visibility(elements) {
+        for (let i = 0; i < elements.length; i++) {
+            this.toggle_element(elements[i]);
+        }
+    }
+    
     request_save_split() {
         // request to show dialog
         ipc_send("get-save-split", "");
@@ -246,7 +256,7 @@ class Timer {
                     }
                     break;
                 case ("2"):
-                    common.toggle_visibility(this.buttons);
+                    this.toggle_visibility(this.buttons);
                     break;
                 case ("3"):
                     this.stop_timer();
