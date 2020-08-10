@@ -64,3 +64,29 @@ export function table_to_dict(current_row, splits, current_game) {
     dict["best_segment_times"] = best_segments;
     return dict;
 }
+
+export function load_split(data, table, current_game, instance=null, json=true) {
+    if (data) {
+        delete_splits(table);
+        let splits = json ? JSON.parse(data) : data;
+        current_game.innerText = splits["game_name"];
+        current_game.style.visibility = "";
+        for (let i = 0; i < splits["split_names"].length; i++) {
+            let row = table.insertRow(-1);
+            if (instance) {
+                row.onclick = (() => instance.select_row(row)).bind(instance);
+            }
+
+            row.insertCell(SPLIT_NAME).innerText = splits["split_names"][i];
+            row.insertCell(SPLIT_TIME).innerText = "/";
+            row.insertCell(COMPARISON).innerText = "/";                
+            row.insertCell(PB_TIME).innerText = splits["split_times"][i];
+            row.insertCell(BS_TIME).innerText = splits["best_segment_times"][i];
+
+            for (let i = 1; i < row.length; i++) {
+                row.cells[i].style.textAlign = "right";
+            }
+        }
+        set_transparent_background(table);
+    }
+}

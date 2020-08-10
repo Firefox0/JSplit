@@ -136,25 +136,6 @@ class Split {
         }
     }
 
-    dict_to_table(splits) {
-        this.current_game.innerText = splits["game_name"];
-        this.current_game.style.visibility = "";
-        for (let i = 0; i < splits["split_names"].length; i++) {
-            let row = this.splits.insertRow(-1);
-            row.onclick = (() => this.select_row(row)).bind(this);
-
-            row.insertCell(common.SPLIT_NAME).innerText = splits["split_names"][i];
-            row.insertCell(common.SPLIT_TIME).innerText = "/";
-            row.insertCell(common.COMPARISON).innerText = "/";                
-            row.insertCell(common.PB_TIME).innerText = splits["split_times"][i];
-            row.insertCell(common.BS_TIME).innerText = splits["best_segment_times"][i];
-
-            for (let i = 1; i < row.length; i++) {
-                row.cells[i].style.textAlign = "right";
-            }
-        }
-    }
-
     set_transparent_background() {
         // set background when there is atleast one split (prevent black spot)
         if (common.splits_exist(this.splits)) {
@@ -170,7 +151,7 @@ class Split {
 
     start_ipc() {
         ipc_receive("request-splits-response", (arg => {
-            this.dict_to_table(arg);
+            common.load_split(arg, this.splits, this.current_game, this, false);
             try {
                 if (common.splits_exist(this.splits)) {
                     common.set_transparent_background(this.splits);
@@ -178,7 +159,9 @@ class Split {
             }
             catch {};
         }).bind(this));
-        ipc_receive("set-loaded-splits", )
+        ipc_receive("set-loaded-splits", arg => {
+            common.load_split(arg, this.splits, this.current_game, this);
+        })
     }
 
     save() {

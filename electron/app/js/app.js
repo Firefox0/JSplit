@@ -202,45 +202,23 @@ class Timer {
         }
     }
     
-    load_split(data, json=true) {
-        if (data) {
-            this.split_button.disabled = false;
-            common.delete_splits(this.splits);
-            let splits = json ? JSON.parse(data) : data;
-            this.current_game.innerText = splits["game_name"];
-            this.current_game.style.visibility = "";
-            for (let i = 0; i < splits["split_names"].length; i++) {
-                let row = this.splits.insertRow(-1);
-                row.onclick = (() => this.select_row(row)).bind(this);
-
-                row.insertCell(common.SPLIT_NAME).innerText = splits["split_names"][i];
-                row.insertCell(common.SPLIT_TIME).innerText = "/";
-                row.insertCell(common.COMPARISON).innerText = "/";                
-                row.insertCell(common.PB_TIME).innerText = splits["split_times"][i];
-                row.insertCell(common.BS_TIME).innerText = splits["best_segment_times"][i];
-
-                for (let i = 1; i < row.length; i++) {
-                    row.cells[i].style.textAlign = "right";
-                }
-            }
-            common.set_transparent_background(this.splits);
-        }
-    }
-
     transfer_splits() {
         let dict = common.table_to_dict(this.current_row, this.splits, this.current_game);
         ipc_send("request-splits-response", dict);
     }
 
+    load_split(data, json=true) {
+        common.load_split(data, this.splits, this.current_game, null, json);
+        this.split_button.disabled = true;
+    }
+
     start_ipc() {
-        ipc_receive("set-loaded-splits", this.load_split.bind(this));
+        ipc_receive("set-loaded-splits", (arg => this.load_split(arg)).bind(this));
         ipc_receive("get-save-split-response", this.save_split.bind(this));
         ipc_receive("get-directory-response", this.pick_directory.bind(this));
         ipc_receive("set-background", this.change_background.bind(this));
         ipc_receive("request-splits", this.transfer_splits.bind(this));
-        ipc_receive("edited-splits", (arg) => {
-            this.load_split(arg, false);
-        })
+        ipc_receive("edited-splits", (arg => this.load_split(arg, false)).bind(this));
     }
     
     key_listener() {
