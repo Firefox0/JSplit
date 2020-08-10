@@ -117,16 +117,14 @@ class Split {
             this.splits_selected--;
         }
         if (this.splits_selected > 0) {
-            if (!this.timer_running) {
-                if (this.splits_selected == 1) {
-                    this.insert_above_button.disabled = false;
-                    this.insert_below_button.disabled = false;
-                }
-                else {
-                    this.insert_above_button.disabled = true;
-                    this.insert_below_button.disabled = true;
-                }   
+            if (this.splits_selected == 1) {
+                this.insert_above_button.disabled = false;
+                this.insert_below_button.disabled = false;
             }
+            else {
+                this.insert_above_button.disabled = true;
+                this.insert_below_button.disabled = true;
+            }   
             this.delete_button.disabled = false;
         }
         else {
