@@ -121,7 +121,6 @@ class Timer {
     }
    
     clear_run() {
-        // clear current times
         for (let i = 0; i < this.splits.rows.length; i++) {
             this.splits.rows[i].cells[common.SPLIT_TIME].innerText = "/";
             this.splits.rows[i].cells[common.COMPARISON].innerText = "/";
@@ -173,7 +172,6 @@ class Timer {
     }
     
     request_save_split() {
-        // request to show dialog
         ipc_send("get-save-split", "");
     }
     
