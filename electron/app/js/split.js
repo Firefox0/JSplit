@@ -2,7 +2,6 @@ import * as common from "./common.js";
 
 class Split {
     
-    splits = [];
     splits_selected = 0;
 
     reset() {
@@ -77,7 +76,6 @@ class Split {
             }
         }
         this.delete_button.disabled = true;
-        // set transparent background when no splits were created (prevent black spot)
         if (!common.splits_exist(this.splits)) {
             this.splits.style.background = "transparent";
         }
@@ -107,7 +105,6 @@ class Split {
     }
 
     select_row(e) {
-        // default color is empty even though it looks white
         if (e.style.color != "black") {
             e.style.color = "black";
             this.splits_selected++;
@@ -158,7 +155,7 @@ class Split {
             catch {};
         }).bind(this));
         ipc_receive("set-loaded-splits", arg => {
-            common.load_split(arg, this.splits, this.current_game, this);
+            common.load_split(arg, this.splits, this.current_game, this, true);
         })
     }
 
@@ -208,6 +205,9 @@ class Split {
 
         this.save_button = document.getElementById("save-button");
         this.save_button.onclick = this.save.bind(this);
+
+        this.splits = document.getElementById("table");
+        this.splits.style.background = "transparent";
 
         this.start_ipc();
         this.get_splits();
