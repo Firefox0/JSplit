@@ -103,18 +103,11 @@ function create_split_win() {
 }
 
 function load_split() {
-    const file = dialog.showOpenDialogSync(win, {
+    const files = dialog.showOpenDialogSync(win, {
         filter: json_filter,
         properties: ["openFile"]
     });
-
-    if (!file) {
-        return null;
-    }
-    else {
-        // file[0] because of array
-        return readFileSync(file[0]).toString();
-    }
+    return files ? readFileSync(files[0]).toString() : null;
 }
 
 function save_split(message) {
